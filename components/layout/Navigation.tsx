@@ -132,6 +132,14 @@ export function Navigation() {
 
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
+                    <Link href="/book" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
+                      Book
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
                     <Link href="/contact" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
                       Contact
                     </Link>
@@ -197,6 +205,10 @@ export function Navigation() {
                   ))}
                 </div>
               </div>
+
+              <Link href="/book" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
+                Book
+              </Link>
 
               <Link href="/contact" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Contact

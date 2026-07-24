@@ -1,5 +1,7 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import BookingCalendar from "@/components/booking/BookingCalendar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GraduationCap, BookOpen, Target, Star, CheckCircle } from "lucide-react"
@@ -482,6 +484,35 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* Booking Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
+                Book a Lesson
+              </h2>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                Pick your dates on the calendar and pay securely per lesson &mdash; it only takes a minute
+              </p>
+            </div>
+            <FadeIn>
+              <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-slate-100" />}>
+                <BookingCalendar />
+              </Suspense>
+            </FadeIn>
+            <p className="mt-8 text-center text-slate-600">
+              <Link
+                href="/book"
+                className="font-medium text-navy underline underline-offset-4 transition-colors hover:text-gold"
+              >
+                How booking works
+              </Link>
+            </p>
           </div>
         </div>
       </section>

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Phone, Mail, MessageCircle, MapPin, Clock } from "lucide-react"
-import { CONTACT_INFO } from "@/lib/constants"
+import { CONTACT_INFO, WEB3FORMS_ACCESS_KEY } from "@/lib/constants"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -15,11 +15,41 @@ export default function ContactPage() {
     message: ""
   })
 
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log("Form submitted:", formData)
-    alert("Thank you for your inquiry! We'll get back to you within 24 hours.")
+
+    // Until a Web3Forms key is configured, fall back to the visitor's email app
+    // so the form is never a dead end.
+    if (!WEB3FORMS_ACCESS_KEY) {
+      const subject = encodeURIComponent("Tuition enquiry from " + formData.name)
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nService: ${formData.service}\n\n${formData.message}`
+      )
+      window.location.href = `mailto:${CONTACT_INFO.EMAIL}?subject=${subject}&body=${body}`
+      return
+    }
+
+    setStatus("sending")
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: "New enquiry from the Aulawell website",
+          from_name: formData.name,
+          ...formData,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error("submit failed")
+      setStatus("success")
+      setFormData({ name: "", email: "", phone: "", service: "", message: "" })
+    } catch {
+      setStatus("error")
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -139,9 +169,24 @@ export default function ContactPage() {
                         ></textarea>
                       </div>
 
-                      <Button type="submit" className="w-full">
-                        Send Message
+                      <Button type="submit" className="w-full" disabled={status === "sending"}>
+                        {status === "sending" ? "Sending…" : "Send Message"}
                       </Button>
+
+                      {status === "success" && (
+                        <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                          Thank you for your enquiry! We&apos;ll get back to you within 24 hours.
+                        </p>
+                      )}
+                      {status === "error" && (
+                        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                          Sorry, your message couldn&apos;t be sent. Please email us directly at{" "}
+                          <a href={`mailto:${CONTACT_INFO.EMAIL}`} className="underline underline-offset-2">
+                            {CONTACT_INFO.EMAIL}
+                          </a>
+                          .
+                        </p>
+                      )}
                     </form>
                   </CardContent>
                 </Card>
