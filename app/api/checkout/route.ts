@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { fetchSlots, isBookingConfigured } from "@/lib/booking/cal"
 import {
   CURRENCY,
+  LESSON_DURATION_MINUTES,
   LESSON_NAME,
   MAX_LESSONS_PER_CHECKOUT,
 } from "@/lib/booking/config"
@@ -71,10 +72,14 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Verify every selected slot is still open with Cal.com right now.
+  // Verify every selected slot is still open with Cal.com right now. The
+  // queried window must cover each candidate lesson in full — Cal.com omits
+  // slots that do not fit entirely inside the requested range.
   try {
     const rangeStart = new Date(Math.min(...wanted) - 60_000).toISOString()
-    const rangeEnd = new Date(Math.max(...wanted) + 60_000).toISOString()
+    const rangeEnd = new Date(
+      Math.max(...wanted) + (LESSON_DURATION_MINUTES + 1) * 60_000
+    ).toISOString()
     const open = await fetchSlots(rangeStart, rangeEnd)
     const openSet = new Set(
       Object.values(open)
