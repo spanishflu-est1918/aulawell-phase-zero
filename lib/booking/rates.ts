@@ -2,17 +2,45 @@
 // rates never appear in the client bundle. The charge amount is always taken
 // from here — never from anything the browser sends.
 
-// Standard per-lesson price in euro cents.
-export const DEFAULT_RATE_CENTS = 4000
+import { TUTOR_TIERS, type TutorTier } from "./config"
+
+export interface FamilyRate {
+  cents: number
+  // Trusted families: lessons are booked without upfront payment and a
+  // Stripe invoice is emailed automatically after each lesson takes place.
+  postPay?: boolean
+}
 
 // Custom per-family rates. After agreeing a rate in the enquiry reply, send
 // the family a link like /book?rate=familyname — they see and pay that rate.
-// Keys are lowercase codes, values are euro cents per lesson.
-export const RATE_CODES: Record<string, number> = {
-  // example: garcia: 3000,
+// Keys are lowercase codes. Family rates apply to Head Tutor (online) lessons
+// only — presencial lessons always use the tier price.
+export const RATE_CODES: Record<string, FamilyRate> = {
+  // example: garcia: { cents: 3000 },
+  // example: smith: { cents: 3500, postPay: true },
 }
 
-export function rateForCode(code?: string | null): number {
-  if (!code) return DEFAULT_RATE_CENTS
-  return RATE_CODES[code.toLowerCase().trim()] ?? DEFAULT_RATE_CENTS
+function familyRate(code?: string | null): FamilyRate | undefined {
+  if (!code) return undefined
+  return RATE_CODES[code.toLowerCase().trim()]
+}
+
+// True when the code maps to a negotiated family price. Such families never
+// get the bundle discount on top — their deal is already the deal.
+export function hasCustomRate(tier: TutorTier, code?: string | null): boolean {
+  return tier === "head" && familyRate(code)?.cents !== undefined
+}
+
+// Per-lesson price in cents before any bundle discount.
+export function unitRateFor(tier: TutorTier, code?: string | null): number {
+  if (tier === "head") {
+    return familyRate(code)?.cents ?? TUTOR_TIERS.head.priceCents
+  }
+  return TUTOR_TIERS[tier].priceCents
+}
+
+// Only an explicitly configured rate code can bypass upfront payment, and
+// only for Head Tutor lessons.
+export function isPostPayCode(code?: string | null): boolean {
+  return familyRate(code)?.postPay === true
 }

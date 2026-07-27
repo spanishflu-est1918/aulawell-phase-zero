@@ -5,12 +5,24 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { BOOKING_TIMEZONE, MAX_LESSONS_PER_CHECKOUT, formatPrice } from "@/lib/booking/config"
+import {
+  BOOKING_TIMEZONE,
+  DEFAULT_TIER,
+  MAX_LESSONS_PER_CHECKOUT,
+  TUTOR_TIERS,
+  type TutorTier,
+  bundleUnitCents,
+  formatPrice,
+  isTutorTier,
+} from "@/lib/booking/config"
 
 interface SlotsResponse {
   configured?: boolean
+  tierAvailable?: boolean
   priceCents?: number
+  customRate?: boolean
   currency?: string
+  postPay?: boolean
   slots?: Record<string, string[]>
   error?: string
 }
@@ -51,6 +63,7 @@ export default function BookingCalendar() {
   const searchParams = useSearchParams()
   const rate = searchParams.get("rate") ?? ""
   const cancelled = searchParams.get("cancelled") === "1"
+  const tierParam = searchParams.get("tier")
 
   const today = useMemo(() => new Date(), [])
   const [viewYear, setViewYear] = useState(today.getFullYear())
@@ -60,6 +73,10 @@ export default function BookingCalendar() {
   const [configured, setConfigured] = useState(true)
   const [loadError, setLoadError] = useState("")
   const [priceCents, setPriceCents] = useState<number | null>(null)
+  const [postPay, setPostPay] = useState(false)
+  const [customRate, setCustomRate] = useState(false)
+  const [tier, setTier] = useState<TutorTier>(isTutorTier(tierParam) ? tierParam : DEFAULT_TIER)
+  const [tierAvailable, setTierAvailable] = useState(true)
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [selected, setSelected] = useState<string[]>([])
   const [name, setName] = useState("")
@@ -68,7 +85,8 @@ export default function BookingCalendar() {
   const [submitError, setSubmitError] = useState("")
 
   const key = monthKey(viewYear, viewMonth)
-  const slots = monthSlots[key]
+  // Availability differs per tutor, so the cache is keyed by tier too.
+  const slots = monthSlots[`${tier}:${key}`]
 
   const loadMonth = useCallback(async (year: number, month: number) => {
     const mKey = monthKey(year, month)
@@ -79,24 +97,37 @@ export default function BookingCalendar() {
       const params = new URLSearchParams({
         start: `${mKey}-01`,
         end: `${mKey}-${pad(lastDay)}`,
+        tier,
       })
       if (rate) params.set("rate", rate)
       const res = await fetch(`/api/slots?${params}`)
       const data: SlotsResponse = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Request failed")
       setConfigured(data.configured !== false)
+      setTierAvailable(data.tierAvailable !== false)
       if (typeof data.priceCents === "number") setPriceCents(data.priceCents)
-      setMonthSlots((prev) => ({ ...prev, [mKey]: data.slots ?? {} }))
+      setPostPay(data.postPay === true)
+      setCustomRate(data.customRate === true)
+      setMonthSlots((prev) => ({ ...prev, [`${tier}:${mKey}`]: data.slots ?? {} }))
     } catch {
       setLoadError("failed")
     } finally {
       setLoadingMonth(false)
     }
-  }, [rate])
+  }, [rate, tier])
 
   useEffect(() => {
     loadMonth(viewYear, viewMonth)
   }, [viewYear, viewMonth, loadMonth])
+
+  const switchTier = (next: TutorTier) => {
+    if (next === tier) return
+    setTier(next)
+    // Selected times belong to the other tutor's calendar.
+    setSelected([])
+    setSelectedDay(null)
+    setSubmitError("")
+  }
 
   const changeMonth = (delta: number) => {
     const d = new Date(viewYear, viewMonth + delta, 1)
@@ -129,7 +160,7 @@ export default function BookingCalendar() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slots: selected, name, email, rate: rate || undefined }),
+        body: JSON.stringify({ slots: selected, name, email, rate: rate || undefined, tier }),
       })
       const data: { url?: string; error?: string } = await res.json()
       if (!res.ok || !data.url) {
@@ -168,7 +199,17 @@ export default function BookingCalendar() {
   ]
 
   const daySlots = selectedDay && slots ? slots[selectedDay] ?? [] : []
-  const total = priceCents !== null ? priceCents * selected.length : null
+  // Families with a negotiated rate keep it as-is; everyone else gets the
+  // bundle discount at 5+ / 10+ lessons — mirroring the server's maths.
+  const unitCents =
+    priceCents !== null
+      ? customRate
+        ? priceCents
+        : bundleUnitCents(priceCents, selected.length)
+      : null
+  const total = unitCents !== null ? unitCents * selected.length : null
+  const savings =
+    priceCents !== null && unitCents !== null ? (priceCents - unitCents) * selected.length : 0
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -179,6 +220,52 @@ export default function BookingCalendar() {
           </p>
         )}
 
+        {/* Tutor tier switcher */}
+        <div className="mb-6 grid gap-3 sm:grid-cols-3">
+          {(Object.keys(TUTOR_TIERS) as TutorTier[]).map((t) => {
+            const info = TUTOR_TIERS[t]
+            const active = t === tier
+            const shownPrice =
+              active && priceCents !== null ? priceCents : info.priceCents
+            return (
+              <button
+                key={t}
+                onClick={() => switchTier(t)}
+                aria-pressed={active}
+                className={`rounded-xl border p-4 text-left transition-colors ${
+                  active
+                    ? "border-navy bg-navy text-white"
+                    : "border-slate-200 bg-white text-navy hover:border-gold"
+                }`}
+              >
+                <span className="block font-semibold">{info.label}</span>
+                <span className={`block text-sm ${active ? "text-gray-200" : "text-slate-500"}`}>
+                  {info.description}
+                </span>
+                <span className={`mt-1 block text-sm font-semibold ${active ? "text-gold" : "text-navy"}`}>
+                  {formatPrice(shownPrice)} / lesson
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {!tierAvailable && !loadingMonth ? (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+            <CalendarDays className="mx-auto mb-4 h-8 w-8 text-gold" />
+            <h4 className="mb-2 text-lg font-semibold text-navy">
+              Associate tutor lessons are arranged personally
+            </h4>
+            <p className="mx-auto max-w-md text-slate-600">
+              Online booking for this associate tutor option is coming soon. For now,{" "}
+              <Link href="/contact" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
+                send us an enquiry
+              </Link>{" "}
+              and we&apos;ll match you with a tutor and arrange times directly.
+            </p>
+          </div>
+        ) : (
+        <>
         {/* Month header */}
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-navy">
@@ -284,6 +371,8 @@ export default function BookingCalendar() {
             )}
           </div>
         )}
+        </>
+        )}
       </div>
 
       {/* Selection summary + checkout */}
@@ -314,12 +403,19 @@ export default function BookingCalendar() {
 
         {selected.length > 0 && (
           <>
-            {total !== null && (
-              <p className="mb-4 border-t border-slate-200 pt-4 text-sm text-slate-700">
-                {selected.length} lesson{selected.length > 1 ? "s" : ""} ×{" "}
-                {formatPrice(priceCents as number)} ={" "}
-                <span className="font-semibold text-navy">{formatPrice(total)}</span>
-              </p>
+            {total !== null && unitCents !== null && (
+              <div className="mb-4 border-t border-slate-200 pt-4 text-sm text-slate-700">
+                <p>
+                  {selected.length} lesson{selected.length > 1 ? "s" : ""} ×{" "}
+                  {formatPrice(unitCents)} ={" "}
+                  <span className="font-semibold text-navy">{formatPrice(total)}</span>
+                </p>
+                {savings > 0 && (
+                  <p className="mt-1 text-xs font-medium text-green-700">
+                    Bundle price applied &mdash; you save {formatPrice(savings)}
+                  </p>
+                )}
+              </div>
             )}
             <div className="space-y-3">
               <input
@@ -343,13 +439,17 @@ export default function BookingCalendar() {
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" /> Redirecting…
                   </span>
+                ) : postPay ? (
+                  "Book lessons"
                 ) : (
                   "Book & pay securely"
                 )}
               </Button>
               {submitError && <p className="text-sm text-red-600">{submitError}</p>}
               <p className="text-xs text-slate-400">
-                Payment is processed securely by Stripe. Your card details never touch this website.
+                {postPay
+                  ? "No payment needed today — you will receive an invoice by email after each lesson."
+                  : "Payment is processed securely by Stripe. Your card details never touch this website."}
               </p>
             </div>
           </>

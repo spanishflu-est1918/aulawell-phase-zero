@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server"
-import { fetchSlots, isBookingConfigured } from "@/lib/booking/cal"
+import {
+  createBooking,
+  fetchSlots,
+  isBookingConfigured,
+  isTierConfigured,
+} from "@/lib/booking/cal"
 import {
   CURRENCY,
+  DEFAULT_TIER,
   LESSON_DURATION_MINUTES,
   LESSON_NAME,
   MAX_LESSONS_PER_CHECKOUT,
+  TUTOR_TIERS,
+  bundleUnitCents,
+  isTutorTier,
 } from "@/lib/booking/config"
-import { rateForCode } from "@/lib/booking/rates"
+import { describeSlot, notifyOwner } from "@/lib/booking/notify"
+import { hasCustomRate, isPostPayCode, unitRateFor } from "@/lib/booking/rates"
 import { getStripe, isStripeConfigured } from "@/lib/booking/stripe"
 
 export const dynamic = "force-dynamic"
@@ -16,6 +26,7 @@ interface CheckoutBody {
   name?: unknown
   email?: unknown
   rate?: unknown
+  tier?: unknown
 }
 
 export async function POST(req: NextRequest) {
@@ -36,9 +47,17 @@ export async function POST(req: NextRequest) {
   const name = typeof body.name === "string" ? body.name.trim() : ""
   const email = typeof body.email === "string" ? body.email.trim() : ""
   const rateCode = typeof body.rate === "string" ? body.rate : undefined
+  const tier = isTutorTier(body.tier) ? body.tier : DEFAULT_TIER
   const slots = Array.isArray(body.slots)
     ? body.slots.filter((s): s is string => typeof s === "string")
     : []
+
+  if (!isTierConfigured(tier)) {
+    return NextResponse.json(
+      { error: "This lesson type cannot be booked online yet — please contact us" },
+      { status: 503 }
+    )
+  }
 
   if (!name || !/.+@.+\..+/.test(email)) {
     return NextResponse.json(
@@ -80,7 +99,7 @@ export async function POST(req: NextRequest) {
     const rangeEnd = new Date(
       Math.max(...wanted) + (LESSON_DURATION_MINUTES + 1) * 60_000
     ).toISOString()
-    const open = await fetchSlots(rangeStart, rangeEnd)
+    const open = await fetchSlots(rangeStart, rangeEnd, tier)
     const openSet = new Set(
       Object.values(open)
         .flat()
@@ -101,11 +120,58 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const unitAmount = rateForCode(rateCode)
+  // Family rates apply to Head Tutor lessons only; families with a negotiated
+  // rate don't get the bundle discount stacked on top of it.
+  const baseUnit = unitRateFor(tier, rateCode)
+  const unitAmount = hasCustomRate(tier, rateCode)
+    ? baseUnit
+    : bundleUnitCents(baseUnit, slots.length)
   const origin = req.nextUrl.origin
   const slotsUtc = wanted
     .sort((a, b) => a - b)
     .map((ms) => new Date(ms).toISOString().replace(".000Z", "Z"))
+
+  // Trusted post-pay families skip payment: lessons are booked immediately
+  // and a Stripe invoice is emailed automatically after each lesson happens
+  // (see /api/cron/postpay-invoices). The postPay flag can only come from
+  // RATE_CODES on the server, never from the browser, and only applies to
+  // Head Tutor lessons.
+  if (tier === "head" && isPostPayCode(rateCode)) {
+    const booked: string[] = []
+    const failed: string[] = []
+    for (const slot of slotsUtc) {
+      const result = await createBooking(slot, { name, email }, {
+        postPay: "true",
+        rateCode: rateCode as string,
+        priceCents: String(unitAmount),
+      })
+      if (result.ok) booked.push(slot)
+      else failed.push(slot)
+    }
+    if (booked.length === 0) {
+      return NextResponse.json(
+        { error: "Sorry, your chosen times were just booked by someone else. Please refresh and pick again." },
+        { status: 409 }
+      )
+    }
+    const lines = [
+      `New post-pay booking from ${name} (${email}) — no payment taken, invoices go out automatically after each lesson.`,
+      "",
+      "Confirmed lessons:",
+      ...booked.map((s) => `  - ${describeSlot(s)}`),
+    ]
+    if (failed.length > 0) {
+      lines.push(
+        "",
+        `NOTE: ${failed.length} slot(s) could not be booked (likely taken meanwhile):`,
+        ...failed.map((s) => `  - ${describeSlot(s)}`)
+      )
+    }
+    await notifyOwner("Aulawell: new lessons booked (post-pay)", lines.join("\n"))
+    const params = new URLSearchParams({ mode: "postpay", slots: booked.join(",") })
+    if (failed.length > 0) params.set("failed", String(failed.length))
+    return NextResponse.json({ url: `${origin}/book/success?${params}` })
+  }
 
   try {
     const session = await getStripe().checkout.sessions.create({
@@ -120,7 +186,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: CURRENCY,
             unit_amount: unitAmount,
-            product_data: { name: LESSON_NAME },
+            product_data: { name: `${LESSON_NAME} — ${TUTOR_TIERS[tier].label}` },
           },
         },
       ],
@@ -129,6 +195,7 @@ export async function POST(req: NextRequest) {
         student_name: name,
         student_email: email,
         rate_code: rateCode ?? "",
+        tier,
       },
       payment_intent_data: {
         metadata: {

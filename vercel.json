@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/postpay-invoices",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}

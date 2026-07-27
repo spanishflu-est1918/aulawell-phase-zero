@@ -2,6 +2,8 @@ import { Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import BookingCalendar from "@/components/booking/BookingCalendar"
+import Packages from "@/components/home/Packages"
+import SuccessStories from "@/components/home/SuccessStories"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GraduationCap, BookOpen, Target, Star, CheckCircle } from "lucide-react"
@@ -90,6 +92,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Outcome-number counters are held back until the real figures are
+          confirmed. To enable: set the true values in lib/site-content.ts,
+          then restore:
+            import StatsBand from "@/components/home/StatsBand"
+            <StatsBand /> (here) */}
 
       {/* Services Section */}
       <section id="services" className="py-20 bg-slate-50">
@@ -418,75 +426,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
-        <div className="container mx-auto px-4">
-          <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
-              What Our Students Say
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Success stories from students who achieved their goals with us
-            </p>
-          </FadeIn>
+      {/* Packages — prices derive from lib/booking/config.ts tier prices */}
+      <Packages />
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <FadeIn delay={100}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-gold fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-slate-600 mb-4">
-                    &quot;My tutor helped me improve from a grade 6 to a grade 9 in GCSE English. 
-                    The personalized approach made all the difference!&quot;
-                  </p>
-                  <div className="font-semibold text-navy">Sarah M.</div>
-                  <div className="text-sm text-slate-500">GCSE Student</div>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={200}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-gold fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-slate-600 mb-4">
-                    &quot;I achieved an 8.0 in IELTS thanks to the excellent preparation. 
-                    The mock tests and feedback were invaluable.&quot;
-                  </p>
-                  <div className="font-semibold text-navy">Ahmed K.</div>
-                  <div className="text-sm text-slate-500">IELTS Student</div>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={300}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-gold fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-slate-600 mb-4">
-                    &quot;The A-Level English Literature support was outstanding. 
-                    I got an A* and secured my place at Oxford!&quot;
-                  </p>
-                  <div className="font-semibold text-navy">Emma T.</div>
-                  <div className="text-sm text-slate-500">A-Level Student</div>
-                </CardContent>
-              </Card>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
+      {/* Success stories — edit content in lib/site-content.ts */}
+      <SuccessStories />
 
       {/* Booking Section */}
       <section className="py-20 bg-slate-50">

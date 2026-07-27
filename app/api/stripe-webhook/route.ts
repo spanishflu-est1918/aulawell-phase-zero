@@ -2,43 +2,19 @@ import { NextRequest, NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { createBooking } from "@/lib/booking/cal"
 import {
-  BOOKING_TIMEZONE,
   CURRENCY,
+  DEFAULT_TIER,
   MAX_LESSONS_PER_CHECKOUT,
+  TUTOR_TIERS,
+  bundleUnitCents,
   formatPrice,
+  isTutorTier,
 } from "@/lib/booking/config"
-import { rateForCode } from "@/lib/booking/rates"
+import { describeSlot, notifyOwner } from "@/lib/booking/notify"
+import { hasCustomRate, unitRateFor } from "@/lib/booking/rates"
 import { getStripe } from "@/lib/booking/stripe"
-import { CONTACT_INFO, WEB3FORMS_ACCESS_KEY } from "@/lib/constants"
 
 export const dynamic = "force-dynamic"
-
-function describeSlot(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: BOOKING_TIMEZONE,
-  }).format(new Date(iso))
-}
-
-async function notifyOwner(subject: string, message: string) {
-  if (!WEB3FORMS_ACCESS_KEY) return
-  try {
-    await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        access_key: WEB3FORMS_ACCESS_KEY,
-        subject,
-        from_name: "Aulawell website",
-        email: CONTACT_INFO.EMAIL,
-        message,
-      }),
-    })
-  } catch (err) {
-    console.error("owner notification failed:", err)
-  }
-}
 
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
@@ -69,7 +45,14 @@ export async function POST(req: NextRequest) {
   const slots = (meta.slots ?? "").split(",").filter(Boolean)
   const name = meta.student_name ?? "Unknown"
   const email = meta.student_email ?? session.customer_email ?? ""
-  const expectedAmount = rateForCode(meta.rate_code) * slots.length
+  const tier = isTutorTier(meta.tier) ? meta.tier : DEFAULT_TIER
+  // Recompute the price exactly as checkout did (tier price or family rate,
+  // then bundle discount) so a tampered session can never verify.
+  const baseUnit = unitRateFor(tier, meta.rate_code)
+  const expectedUnit = hasCustomRate(tier, meta.rate_code)
+    ? baseUnit
+    : bundleUnitCents(baseUnit, slots.length)
+  const expectedAmount = expectedUnit * slots.length
 
   if (
     session.mode !== "payment" ||
@@ -85,14 +68,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid Checkout session" }, { status: 400 })
   }
 
+  // Stripe may deliver the same event more than once. The event payload is a
+  // snapshot, so re-fetch the session and check the fulfilment marker we set
+  // after booking — otherwise a retry would create every lesson twice.
+  try {
+    const fresh = await getStripe().checkout.sessions.retrieve(session.id)
+    if (fresh.metadata?.cal_fulfilled === "1") {
+      return NextResponse.json({ received: true })
+    }
+  } catch (err) {
+    console.error("webhook: could not re-fetch session", session.id, err)
+  }
+
   const booked: string[] = []
   const failed: Array<{ slot: string; error?: string }> = []
   for (const slot of slots) {
     const result = await createBooking(slot, { name, email }, {
       stripeSessionId: session.id,
-    })
+    }, tier)
     if (result.ok) booked.push(slot)
     else failed.push({ slot, error: result.error })
+  }
+
+  try {
+    await getStripe().checkout.sessions.update(session.id, {
+      metadata: { ...meta, cal_fulfilled: "1" },
+    })
+  } catch (err) {
+    console.error("webhook: could not mark session fulfilled", session.id, err)
   }
 
   // Refund any lesson whose slot could not be booked (e.g. taken during payment).
@@ -118,6 +121,7 @@ export async function POST(req: NextRequest) {
 
   const lines = [
     `New paid booking from ${name} (${email})`,
+    `Lesson type: ${TUTOR_TIERS[tier].label}`,
     `Amount paid: ${formatPrice(session.amount_total ?? 0)}`,
     "",
     "Confirmed lessons:",
