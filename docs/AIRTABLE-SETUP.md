@@ -7,6 +7,16 @@ if you change a name here, change it there too (or set the matching env var).
 
 Base: `appLE4zXHreNWQt93` (override with `AIRTABLE_BASE_ID`).
 
+> **Live status.** Two intake tables have been created in the base and wired up,
+> feeding your existing ops tables (Clients, Programmes & Cycles, Students &
+> Groups, Tutors, LESSONS, Tutor Fees) without disturbing them:
+> - **Website Leads** — `tblnGCUZc49JKhG5W` (enquiries) — verified working.
+> - **Website Bookings** — `tblaMd8QDAYgF4CkU` (paid bookings) — created; will
+>   populate on the first real/test Stripe booking.
+>
+> These ids are pinned in `.env.local` (`AIRTABLE_LEADS_TABLE`,
+> `AIRTABLE_PACKAGES_TABLE`); add the same values in Vercel for the live site.
+
 ## Turning it on
 
 1. Create a **Personal Access Token**: airtable.com/create/tokens
@@ -25,9 +35,8 @@ by email — they simply are not written to Airtable.
 
 ## Table: Leads (enquiries)
 
-Written by the enquiry form (`/enquire` → `/api/enquire`). Default table id:
-`tblPGDdmQObBqpOrv` (the shared base URL's table). Override with
-`AIRTABLE_LEADS_TABLE`.
+Written by the enquiry form (`/enquire` → `/api/enquire`). Default table name:
+`Website Leads` (id `tblnGCUZc49JKhG5W`). Override with `AIRTABLE_LEADS_TABLE`.
 
 | Column          | Type                | Notes / options |
 | --------------- | ------------------- | --------------- |
@@ -50,7 +59,8 @@ Written by the enquiry form (`/enquire` → `/api/enquire`). Default table id:
 ## Table: Packages (paid bookings)
 
 Written by the Stripe webhook (`/api/stripe-webhook`) after a successful, paid
-booking. Default table name: `Packages`. Override with `AIRTABLE_PACKAGES_TABLE`.
+booking. Default table name: `Website Bookings` (id `tblaMd8QDAYgF4CkU`).
+Override with `AIRTABLE_PACKAGES_TABLE`.
 
 | Column           | Type             | Notes / options |
 | ---------------- | ---------------- | --------------- |

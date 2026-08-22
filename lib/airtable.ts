@@ -26,9 +26,9 @@ const BASE_ID = process.env.AIRTABLE_BASE_ID || "appLE4zXHreNWQt93"
 // Defaults use the brief's table names; the Leads default is the table id from
 // the shared URL so enquiries land there even before names are confirmed.
 const TABLES = {
-  leads: process.env.AIRTABLE_LEADS_TABLE || "tblPGDdmQObBqpOrv",
-  packages: process.env.AIRTABLE_PACKAGES_TABLE || "Packages",
-  lessons: process.env.AIRTABLE_LESSONS_TABLE || "Lessons",
+  leads: process.env.AIRTABLE_LEADS_TABLE || "Website Leads",
+  packages: process.env.AIRTABLE_PACKAGES_TABLE || "Website Bookings",
+  lessons: process.env.AIRTABLE_LESSONS_TABLE || "LESSONS",
 }
 
 // Logical field → Airtable field name. If the base uses different column names,
