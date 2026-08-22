@@ -6,9 +6,6 @@ import {
   GraduationCap,
   Globe,
   Compass,
-  Heart,
-  Users,
-  ClipboardCheck,
   Sparkles,
   ArrowRight,
 } from "lucide-react"
@@ -38,28 +35,13 @@ const serviceIcons: Record<string, typeof BookOpen> = {
   "university-applications": Compass,
 }
 
-const whyAulawell = [
-  {
-    icon: Users,
-    title: "Bespoke, one-to-one teaching",
-    body: "Every learner works one-to-one with a tutor who shapes each lesson around the curriculum, the goal and what comes next.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Carefully selected educators",
-    body: "Tuition is delivered by Aulawell tutors, overseen by Amy, our Founder and Academic Director, with the option to work with Amy directly.",
-  },
-  {
-    icon: Heart,
-    title: "Wellbeing built in",
-    body: "Academic excellence with confidence, motivation and sustainable progress — never pressure for its own sake.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Progress you can see",
-    body: "Clear communication and parent visibility of progress, so families always understand how a learner is getting on.",
-  },
-]
+// The brand concept, tightened for the homepage — the fuller version lives
+// on /about. Aula (classroom, academic excellence) + Well (wellbeing,
+// confidence, resilience) is the whole positioning; keep this short.
+const aulaCopy =
+  "Spanish for classroom — rigorous, one-to-one academic support that builds real skills, from school English to the qualifications that open doors."
+const wellCopy =
+  "What makes the learning last — confidence, motivation and resilience woven into every lesson, so progress holds long after it ends."
 
 const howItWorks = [
   { step: "01", title: "Choose your service", body: "School English, exams, English qualifications or university applications." },
@@ -199,33 +181,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5 · Why Aulawell */}
+      {/* 5 · Why Aulawell — the brand concept, Aula + Well */}
       <section className="py-20 sm:py-24">
-        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
           <FadeIn className="mx-auto max-w-2xl text-center">
-            <Eyebrow>Why Aulawell</Eyebrow>
+            <Eyebrow className="justify-center">Why Aulawell</Eyebrow>
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
               Academic excellence, with wellbeing built in
             </h2>
-            <p className="mt-4 text-ink-soft">
-              Aulawell is the classroom, made well — a premium English learning
-              and mentoring platform, not a tutor marketplace.
-            </p>
           </FadeIn>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {whyAulawell.map((item, i) => (
-              <FadeIn key={item.title} delay={i * 90}>
-                <div className="flex h-full flex-col rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-cream-panel">
-                    <item.icon className="h-5 w-5 text-gold-ink" />
-                  </div>
-                  <h3 className="mt-4 font-serif text-lg text-navy">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">{item.body}</p>
-                </div>
-              </FadeIn>
-            ))}
+          <div className="mt-14 grid gap-6 lg:grid-cols-2">
+            <FadeIn>
+              <div className="flex h-full flex-col rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
+                <span className="font-serif text-2xl italic text-gold-ink">Aula</span>
+                <h3 className="mt-2 font-serif text-lg text-navy">The classroom</h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">{aulaCopy}</p>
+              </div>
+            </FadeIn>
+            <FadeIn delay={120}>
+              <div className="flex h-full flex-col rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
+                <span className="font-serif text-2xl italic text-gold-ink">Well</span>
+                <h3 className="mt-2 font-serif text-lg text-navy">The wellbeing</h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">{wellCopy}</p>
+              </div>
+            </FadeIn>
           </div>
+
+          <FadeIn delay={200} className="mt-10 text-center">
+            <p className="font-serif text-xl italic text-navy sm:text-2xl">
+              Aulawell is the classroom, made well.
+            </p>
+          </FadeIn>
         </div>
       </section>
 

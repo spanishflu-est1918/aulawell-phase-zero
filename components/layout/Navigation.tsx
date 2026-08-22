@@ -8,7 +8,16 @@ import { Menu, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type NavChild = { title: string; href: string; note?: string }
-type NavItem = { title: string; href?: string; children?: NavChild[] }
+type NavItem = {
+  title: string
+  href?: string
+  children?: NavChild[]
+  // Panels near the right edge of the nav must open flush with the
+  // trigger's right edge, or they overflow past the viewport (and even
+  // while closed, an offscreen `invisible` panel still inflates the
+  // page's scrollable width since `visibility:hidden` keeps layout).
+  align?: "left" | "right"
+}
 
 const NAV: NavItem[] = [
   { title: "Home", href: "/" },
@@ -27,6 +36,7 @@ const NAV: NavItem[] = [
   },
   {
     title: "About",
+    align: "right",
     children: [
       { title: "About Aulawell", href: "/about" },
       { title: "Meet the Tutors", href: "/about/tutors" },
@@ -114,7 +124,8 @@ export function Navigation() {
 
                   <div
                     className={cn(
-                      "absolute left-0 top-full min-w-[16rem] pt-2 transition-all duration-150",
+                      "absolute top-full min-w-[16rem] pt-2 transition-all duration-150",
+                      item.align === "right" ? "right-0" : "left-0",
                       openMenu === item.title
                         ? "visible translate-y-0 opacity-100"
                         : "invisible -translate-y-1 opacity-0"
