@@ -51,7 +51,18 @@ export function Navigation() {
     setMobileOpen(false)
   }, [pathname])
 
+  // Lock body scroll while the full-screen mobile menu is open.
+  React.useEffect(() => {
+    if (!mobileOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileOpen])
+
   return (
+    <>
     <nav className="sticky top-0 z-50 w-full border-b border-navy/10 bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80">
       <div className="mx-auto flex h-16 max-w-[1340px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -157,23 +168,39 @@ export function Navigation() {
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
+    </nav>
 
-      {/* Mobile navigation */}
-      {mobileOpen && (
-        <div className="border-t border-navy/10 bg-cream md:hidden">
-          <div className="mx-auto max-w-[1340px] space-y-1 px-4 py-4 sm:px-6">
-            {NAV.map((item) =>
-              item.children ? (
-                <div key={item.title} className="py-1">
-                  <p className="px-1 pb-1 text-xs font-semibold uppercase tracking-widest text-gold-ink">
+    {/* Mobile navigation — full-height drawer below the fixed header. Kept
+        OUTSIDE <nav> deliberately: nav uses backdrop-blur, and
+        backdrop-filter creates a new containing block for fixed-position
+        descendants, which would collapse this drawer's height to 0. */}
+      <div
+        aria-hidden={!mobileOpen}
+        className={cn(
+          "fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col bg-cream md:hidden",
+          "transition-all duration-300 ease-out",
+          mobileOpen
+            ? "visible translate-y-0 opacity-100"
+            : "invisible -translate-y-2 opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 pb-4 pt-6">
+          {NAV.map((item, i) => (
+            <div
+              key={item.title}
+              className={cn(i > 0 && "mt-6 border-t border-navy/10 pt-6")}
+            >
+              {item.children ? (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gold-ink">
                     {item.title}
                   </p>
-                  <div className="flex flex-col">
+                  <div className="mt-1 flex flex-col">
                     {item.children.map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className="flex items-center gap-2 rounded-lg px-1 py-2 text-[0.95rem] font-medium text-navy/85 hover:text-gold-ink"
+                        className="flex items-center gap-2 rounded-lg py-3 text-[1.05rem] font-medium text-navy/90 transition-colors active:text-gold-ink"
                       >
                         {child.title}
                         {child.note && (
@@ -184,26 +211,29 @@ export function Navigation() {
                       </Link>
                     ))}
                   </div>
-                </div>
+                </>
               ) : (
                 <Link
-                  key={item.title}
                   href={item.href!}
-                  className="block rounded-lg px-1 py-2 text-[0.95rem] font-semibold text-navy hover:text-gold-ink"
+                  className="block py-1 text-lg font-semibold text-navy transition-colors active:text-gold-ink"
                 >
                   {item.title}
                 </Link>
-              )
-            )}
-            <Link
-              href="/book"
-              className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full bg-navy px-6 text-sm font-semibold text-white"
-            >
-              Book
-            </Link>
-          </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
-    </nav>
+
+        {/* CTA anchored at the bottom of the drawer, always reachable. */}
+        <div className="border-t border-navy/10 bg-cream px-6 py-5">
+          <Link
+            href="/book"
+            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-navy text-sm font-semibold text-white shadow-sm transition-colors active:bg-navy-dark"
+          >
+            Book English Support
+          </Link>
+        </div>
+      </div>
+    </>
   )
 }
