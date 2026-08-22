@@ -13,6 +13,7 @@ import {
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { hasCustomRate, unitRateFor } from "@/lib/booking/rates"
 import { getStripe } from "@/lib/booking/stripe"
+import { createBookingRecord } from "@/lib/airtable"
 
 export const dynamic = "force-dynamic"
 
@@ -140,6 +141,19 @@ export async function POST(req: NextRequest) {
       : "Aulawell: new lessons booked",
     lines.join("\n")
   )
+
+  // Operational record in Airtable (fail-soft — never affects fulfilment).
+  if (booked.length > 0) {
+    await createBookingRecord({
+      name,
+      email,
+      tierLabel: TUTOR_TIERS[tier].label,
+      amountPaidPence: session.amount_total ?? 0,
+      currency: session.currency ?? CURRENCY,
+      lessonSlotsIso: booked,
+      stripeSessionId: session.id,
+    })
+  }
 
   return NextResponse.json({ received: true })
 }

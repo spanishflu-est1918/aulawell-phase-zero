@@ -3,247 +3,207 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, GraduationCap, BookOpen } from "lucide-react"
-
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
+import { usePathname } from "next/navigation"
+import { Menu, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const academicEnglishItems = [
-  { title: "Overview", href: "/services#academic-subjects", description: "All academic programs" },
-  { title: "KS3", href: "/services#academic-subjects", description: "Key Stage 3 English support" },
-  { title: "GCSE", href: "/services#academic-subjects", description: "GCSE English preparation" },
-  { title: "IGCSE", href: "/services#academic-subjects", description: "International GCSE English" },
-  { title: "A-Level", href: "/services#academic-subjects", description: "A-Level English courses" },
-  { title: "IB", href: "/services#academic-subjects", description: "International Baccalaureate English" },
+type NavChild = { title: string; href: string; note?: string }
+type NavItem = { title: string; href?: string; children?: NavChild[] }
+
+const NAV: NavItem[] = [
+  { title: "Home", href: "/" },
+  {
+    title: "Services",
+    children: [
+      { title: "School English", href: "/services/school-english" },
+      { title: "Exam & Academic English", href: "/services/exam-academic-english" },
+      { title: "English Qualifications", href: "/services/english-qualifications" },
+      { title: "University Applications", href: "/services/university-applications" },
+    ],
+  },
+  {
+    title: "Aulawell Hub",
+    children: [{ title: "Reading Hub", href: "/aulawell-hub", note: "Coming Soon" }],
+  },
+  {
+    title: "About",
+    children: [
+      { title: "About Aulawell", href: "/about" },
+      { title: "Meet the Tutors", href: "/about/tutors" },
+      { title: "How It Works", href: "/about/how-it-works" },
+    ],
+  },
 ]
 
-const englishLanguageItems = [
-  { title: "Overview", href: "/services#english-language", description: "All language programs" },
-  { title: "General English", href: "/services#english-language", description: "Improve your everyday English" },
-  { title: "FCE", href: "/services#english-language", description: "First Certificate preparation" },
-  { title: "Advanced", href: "/services#english-language", description: "Advanced English courses" },
-  { title: "IELTS", href: "/services#english-language", description: "IELTS exam preparation" },
-  { title: "Academic English", href: "/services#academic-english", description: "Academic writing and skills" },
-]
+// One shared style for every top-level label so desktop alignment, size,
+// weight and line height are identical across links and dropdown triggers.
+const topLabel =
+  "flex h-16 items-center gap-1 px-3 text-[0.9rem] font-medium leading-none tracking-tight text-navy/90 transition-colors hover:text-gold-ink focus-visible:outline-none focus-visible:text-gold-ink"
 
 export function Navigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const pathname = usePathname()
+  const [openMenu, setOpenMenu] = React.useState<string | null>(null)
+  const [mobileOpen, setMobileOpen] = React.useState(false)
+
+  // Close menus on route change.
+  React.useEffect(() => {
+    setOpenMenu(null)
+    setMobileOpen(false)
+  }, [pathname])
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 transition-transform hover:scale-105">
-            <Image
-              src="/aulawell-logo.png"
-              alt="Aulawell English"
-              width={300}
-              height={80}
-              className="w-48 md:w-64 h-auto"
-              priority
-            />
-          </Link>
+    <nav className="sticky top-0 z-50 w-full border-b border-navy/10 bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/80">
+      <div className="mx-auto flex h-16 max-w-[1340px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex items-center" aria-label="Aulawell home">
+          <Image
+            src="/aulawell-logo.png"
+            alt="Aulawell"
+            width={300}
+            height={80}
+            className="h-11 w-auto sm:h-12"
+            priority
+          />
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
-                      Home
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+        {/* Desktop navigation */}
+        <div className="hidden items-center md:flex">
+          <ul className="flex items-center">
+            {NAV.map((item) =>
+              item.children ? (
+                <li
+                  key={item.title}
+                  className="relative"
+                  onMouseEnter={() => setOpenMenu(item.title)}
+                  onMouseLeave={() => setOpenMenu(null)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null)
+                  }}
+                >
+                  <button
+                    type="button"
+                    className={topLabel}
+                    aria-haspopup="true"
+                    aria-expanded={openMenu === item.title}
+                    onClick={() =>
+                      setOpenMenu((cur) => (cur === item.title ? null : item.title))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setOpenMenu(null)
+                    }}
+                  >
+                    {item.title}
+                    <ChevronDown
+                      className={cn(
+                        "h-3.5 w-3.5 transition-transform duration-200",
+                        openMenu === item.title && "rotate-180"
+                      )}
+                    />
+                  </button>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/about" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
-                      About
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-navy hover:text-gold data-[state=open]:text-gold bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">Academic English</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <Link 
-                            href="/services#academic-subjects"
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-navy/10 to-navy/20 p-6 no-underline outline-none focus:shadow-md hover:scale-[1.02] transition-transform"
-                          >
-                            <GraduationCap className="h-6 w-6 text-navy" />
-                            <div className="mb-2 mt-4 text-lg font-medium text-navy">
-                              Academic Excellence
-                            </div>
-                            <p className="text-sm leading-tight text-navy/80">
-                              Expert tutoring for UK curriculum and international qualifications
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      {academicEnglishItems.map((item) => (
-                        <ListItem key={item.title} title={item.title} href={item.href}>
-                          {item.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-navy hover:text-gold data-[state=open]:text-gold bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">English Language</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
+                  <div
+                    className={cn(
+                      "absolute left-0 top-full min-w-[16rem] pt-2 transition-all duration-150",
+                      openMenu === item.title
+                        ? "visible translate-y-0 opacity-100"
+                        : "invisible -translate-y-1 opacity-0"
+                    )}
+                  >
+                    <ul className="overflow-hidden rounded-xl border border-navy/10 bg-white p-1.5 shadow-xl shadow-navy/5">
+                      {item.children.map((child) => (
+                        <li key={child.href}>
                           <Link
-                            href="/services#english-language"
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-gold/10 to-gold/20 p-6 no-underline outline-none focus:shadow-md hover:scale-[1.02] transition-transform"
+                            href={child.href}
+                            className="flex items-center justify-between gap-4 rounded-lg px-3.5 py-2.5 text-sm font-medium text-navy/85 transition-colors hover:bg-cream hover:text-gold-ink"
                           >
-                            <BookOpen className="h-6 w-6 text-gold" />
-                            <div className="mb-2 mt-4 text-lg font-medium text-navy">
-                              Language Mastery
-                            </div>
-                            <p className="text-sm leading-tight text-navy/80">
-                              From everyday English to professional certifications
-                            </p>
+                            {child.title}
+                            {child.note && (
+                              <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-gold-ink">
+                                {child.note}
+                              </span>
+                            )}
                           </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      {englishLanguageItems.map((item) => (
-                        <ListItem key={item.title} title={item.title} href={item.href}>
-                          {item.description}
-                        </ListItem>
+                        </li>
                       ))}
                     </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/book" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
-                      Book
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/contact" className="inline-flex h-9 w-max items-center justify-center px-4 py-2 text-sm font-medium text-navy hover:text-gold transition-colors">
-                      Contact
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-slate-900" />
-            ) : (
-              <Menu className="h-6 w-6 text-slate-900" />
+                  </div>
+                </li>
+              ) : (
+                <li key={item.title}>
+                  <Link href={item.href!} className={topLabel}>
+                    {item.title}
+                  </Link>
+                </li>
+              )
             )}
-          </button>
+          </ul>
+
+          <Link
+            href="/book"
+            className="ml-4 inline-flex h-10 items-center rounded-full bg-navy px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-navy-dark"
+          >
+            Book
+          </Link>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 animate-fade-in">
-            <div className="flex flex-col space-y-4">
-              <Link href="/" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
-                Home
-              </Link>
-              <Link href="/about" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
-                About
-              </Link>
-              
-              <div className="space-y-2">
-                <p className="text-lg font-medium">Academic English</p>
-                <div className="ml-4 space-y-2">
-                  {academicEnglishItems.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      className="block text-sm text-gray-600 py-1 hover:text-gold"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-lg font-medium">English Language</p>
-                <div className="ml-4 space-y-2">
-                  {englishLanguageItems.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      className="block text-sm text-gray-600 py-1 hover:text-gold"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <Link href="/book" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
-                Book
-              </Link>
-
-              <Link href="/contact" className="text-lg font-medium" onClick={() => setMobileMenuOpen(false)}>
-                Contact
-              </Link>
-            </div>
-          </div>
-        )}
+        {/* Mobile toggle */}
+        <button
+          type="button"
+          className="rounded-lg p-2 text-navy transition-colors hover:bg-cream-panel md:hidden"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
+
+      {/* Mobile navigation */}
+      {mobileOpen && (
+        <div className="border-t border-navy/10 bg-cream md:hidden">
+          <div className="mx-auto max-w-[1340px] space-y-1 px-4 py-4 sm:px-6">
+            {NAV.map((item) =>
+              item.children ? (
+                <div key={item.title} className="py-1">
+                  <p className="px-1 pb-1 text-xs font-semibold uppercase tracking-widest text-gold-ink">
+                    {item.title}
+                  </p>
+                  <div className="flex flex-col">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className="flex items-center gap-2 rounded-lg px-1 py-2 text-[0.95rem] font-medium text-navy/85 hover:text-gold-ink"
+                      >
+                        {child.title}
+                        {child.note && (
+                          <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-gold-ink">
+                            {child.note}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={item.title}
+                  href={item.href!}
+                  className="block rounded-lg px-1 py-2 text-[0.95rem] font-semibold text-navy hover:text-gold-ink"
+                >
+                  {item.title}
+                </Link>
+              )
+            )}
+            <Link
+              href="/book"
+              className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full bg-navy px-6 text-sm font-semibold text-white"
+            >
+              Book
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { href: string }
->(({ className, title, children, href, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          ref={ref}
-          href={href}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  )
-})
-ListItem.displayName = "ListItem"
