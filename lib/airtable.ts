@@ -121,6 +121,15 @@ export interface BookingRecordInput {
   currency: string
   lessonSlotsIso: string[]
   stripeSessionId?: string
+  customerType?: CustomerType
+}
+
+// Human-readable labels for the "Customer Type" single-select field — must
+// match the choices created on the Website Bookings table exactly.
+const CUSTOMER_TYPE_LABELS: Record<CustomerType, string> = {
+  new: "New",
+  returning: "Returning — review 20% offer",
+  unknown: "Unknown — check manually",
 }
 
 // Record a paid booking. Writes a package/purchase row (best-effort). Field
@@ -139,5 +148,43 @@ export async function createBookingRecord(
     "Stripe Session": input.stripeSessionId,
     Status: "Paid",
     Source: "Website booking",
+    "Customer Type": input.customerType ? CUSTOMER_TYPE_LABELS[input.customerType] : undefined,
   })
+}
+
+// ---------------------------------------------------------------------------
+// First-10-lesson-package discount check.
+//
+// The 20% saving is only meant to apply to a learner's FIRST 10-lesson
+// package. The Stripe charge is always taken at the advertised (20%-off)
+// price — we do not silently change what a customer is charged. Instead this
+// looks up prior 10-lesson purchases by email so a repeat 10-lesson booking
+// can be FLAGGED for Amy to review and apply manually (e.g. a follow-up
+// invoice or adjustment), per her instruction.
+//
+// Tri-state result: "new" / "returning" are only returned when the lookup
+// actually ran; "unknown" covers not-configured or any lookup failure, so a
+// note can say "please check manually" rather than falsely claiming "new".
+// ---------------------------------------------------------------------------
+export type CustomerType = "new" | "returning" | "unknown"
+
+export async function checkTenLessonCustomerType(email: string): Promise<CustomerType> {
+  if (!isAirtableConfigured() || !email) return "unknown"
+  try {
+    const safeEmail = email.toLowerCase().replace(/'/g, "\\'")
+    const formula = `AND(LOWER({Email})='${safeEmail}', {Lessons Booked}>=10)`
+    const url = `${AIRTABLE_API}/${BASE_ID}/${encodeURIComponent(TABLES.packages)}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` },
+    })
+    if (!res.ok) {
+      console.error(`[airtable] ten-lesson lookup failed (${res.status})`)
+      return "unknown"
+    }
+    const data = (await res.json()) as { records?: unknown[] }
+    return (data.records?.length ?? 0) > 0 ? "returning" : "new"
+  } catch (err) {
+    console.error("[airtable] ten-lesson lookup error:", err)
+    return "unknown"
+  }
 }

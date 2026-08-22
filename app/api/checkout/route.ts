@@ -27,6 +27,7 @@ interface CheckoutBody {
   email?: unknown
   rate?: unknown
   tier?: unknown
+  service?: unknown
 }
 
 export async function POST(req: NextRequest) {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
   const email = typeof body.email === "string" ? body.email.trim() : ""
   const rateCode = typeof body.rate === "string" ? body.rate : undefined
   const tier = isTutorTier(body.tier) ? body.tier : DEFAULT_TIER
+  const service = typeof body.service === "string" ? body.service : undefined
   const slots = Array.isArray(body.slots)
     ? body.slots.filter((s): s is string => typeof s === "string")
     : []
@@ -122,7 +124,7 @@ export async function POST(req: NextRequest) {
 
   // Family rates apply to Head Tutor lessons only; families with a negotiated
   // rate don't get the bundle discount stacked on top of it.
-  const baseUnit = unitRateFor(tier, rateCode)
+  const baseUnit = unitRateFor(tier, rateCode, service)
   const unitAmount = hasCustomRate(tier, rateCode)
     ? baseUnit
     : bundleUnitCents(baseUnit, slots.length)
@@ -196,6 +198,7 @@ export async function POST(req: NextRequest) {
         student_email: email,
         rate_code: rateCode ?? "",
         tier,
+        service: service ?? "",
       },
       payment_intent_data: {
         metadata: {

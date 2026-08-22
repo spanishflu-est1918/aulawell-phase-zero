@@ -13,7 +13,7 @@ import {
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { hasCustomRate, unitRateFor } from "@/lib/booking/rates"
 import { getStripe } from "@/lib/booking/stripe"
-import { createBookingRecord } from "@/lib/airtable"
+import { createBookingRecord, checkTenLessonCustomerType } from "@/lib/airtable"
 
 export const dynamic = "force-dynamic"
 
@@ -47,9 +47,10 @@ export async function POST(req: NextRequest) {
   const name = meta.student_name ?? "Unknown"
   const email = meta.student_email ?? session.customer_email ?? ""
   const tier = isTutorTier(meta.tier) ? meta.tier : DEFAULT_TIER
+  const service = meta.service || undefined
   // Recompute the price exactly as checkout did (tier price or family rate,
   // then bundle discount) so a tampered session can never verify.
-  const baseUnit = unitRateFor(tier, meta.rate_code)
+  const baseUnit = unitRateFor(tier, meta.rate_code, service)
   const expectedUnit = hasCustomRate(tier, meta.rate_code)
     ? baseUnit
     : bundleUnitCents(baseUnit, slots.length)
@@ -120,6 +121,15 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // The 20% saving only applies to a learner's FIRST 10-lesson package. We
+  // always charge the advertised (20%-off) price at checkout — never a
+  // silent surcharge — but for a 10+ lesson purchase we check Airtable for a
+  // prior 10-lesson package by this email so a repeat purchase is flagged
+  // for Amy to review and apply the offer rules manually. Checked before the
+  // current booking is written, so it can never match itself.
+  const checkTenLesson = slots.length >= 10
+  const customerType = checkTenLesson ? await checkTenLessonCustomerType(email) : undefined
+
   const lines = [
     `New paid booking from ${name} (${email})`,
     `Lesson type: ${TUTOR_TIERS[tier].label}`,
@@ -135,10 +145,28 @@ export async function POST(req: NextRequest) {
       ...failed.map((f) => `  - ${describeSlot(f.slot)} (${f.error ?? "unknown error"})`)
     )
   }
+  if (customerType === "returning") {
+    lines.push(
+      "",
+      "ACTION NEEDED — 20% saving eligibility: this email has a previous 10-lesson " +
+        "package on record. The 20% saving is meant for a learner's first 10-lesson " +
+        "package only — please review and apply the offer rules manually (e.g. an " +
+        "adjustment invoice) if this booking should not have received it."
+    )
+  } else if (customerType === "unknown") {
+    lines.push(
+      "",
+      "NOTE — 20% saving eligibility could not be checked automatically (Airtable " +
+        "lookup unavailable). Please confirm manually whether this is the learner's " +
+        "first 10-lesson package."
+    )
+  }
   await notifyOwner(
     failed.length > 0
       ? "Aulawell booking: action needed"
-      : "Aulawell: new lessons booked",
+      : customerType === "returning"
+        ? "Aulawell booking: action needed — check 20% eligibility"
+        : "Aulawell: new lessons booked",
     lines.join("\n")
   )
 
@@ -152,6 +180,7 @@ export async function POST(req: NextRequest) {
       currency: session.currency ?? CURRENCY,
       lessonSlotsIso: booked,
       stripeSessionId: session.id,
+      customerType,
     })
   }
 

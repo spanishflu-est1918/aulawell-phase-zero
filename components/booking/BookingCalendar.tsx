@@ -64,6 +64,9 @@ export default function BookingCalendar() {
   const rate = searchParams.get("rate") ?? ""
   const cancelled = searchParams.get("cancelled") === "1"
   const tierParam = searchParams.get("tier")
+  // Which service page the visitor came from — only affects Head Tutor
+  // pricing (school vs exam), see lib/booking/rates.ts.
+  const service = searchParams.get("service") ?? ""
 
   const today = useMemo(() => new Date(), [])
   const [viewYear, setViewYear] = useState(today.getFullYear())
@@ -100,6 +103,7 @@ export default function BookingCalendar() {
         tier,
       })
       if (rate) params.set("rate", rate)
+      if (service) params.set("service", service)
       const res = await fetch(`/api/slots?${params}`)
       const data: SlotsResponse = await res.json()
       if (!res.ok) throw new Error(data.error ?? "Request failed")
@@ -114,7 +118,7 @@ export default function BookingCalendar() {
     } finally {
       setLoadingMonth(false)
     }
-  }, [rate, tier])
+  }, [rate, tier, service])
 
   useEffect(() => {
     loadMonth(viewYear, viewMonth)
@@ -160,7 +164,14 @@ export default function BookingCalendar() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slots: selected, name, email, rate: rate || undefined, tier }),
+        body: JSON.stringify({
+          slots: selected,
+          name,
+          email,
+          rate: rate || undefined,
+          tier,
+          service: service || undefined,
+        }),
       })
       const data: { url?: string; error?: string } = await res.json()
       if (!res.ok || !data.url) {
