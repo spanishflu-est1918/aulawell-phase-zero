@@ -132,7 +132,7 @@ export default async function BookingSuccessPage({
               <p className="text-xl text-slate-600 mb-8">
                 We couldn&apos;t confirm this payment session. If you completed a payment,
                 you&apos;ll still receive your confirmation email shortly &mdash; or{" "}
-                <Link href="/contact" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
+                <Link href="/enquire" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
                   contact us
                 </Link>{" "}
                 and we&apos;ll sort it out.

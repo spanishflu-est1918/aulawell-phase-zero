@@ -191,7 +191,7 @@ export default function BookingCalendar() {
         <h3 className="mb-2 text-xl font-semibold text-navy">Online booking is almost ready</h3>
         <p className="mx-auto max-w-md text-slate-600">
           We&apos;re putting the finishing touches on online booking. In the meantime,{" "}
-          <Link href="/contact" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
+          <Link href="/enquire" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
             send us an enquiry
           </Link>{" "}
           and we&apos;ll arrange your lessons personally.
@@ -269,7 +269,7 @@ export default function BookingCalendar() {
             </h4>
             <p className="mx-auto max-w-md text-slate-600">
               Online booking for this associate tutor option is coming soon. For now,{" "}
-              <Link href="/contact" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
+              <Link href="/enquire" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
                 send us an enquiry
               </Link>{" "}
               and we&apos;ll match you with a tutor and arrange times directly.

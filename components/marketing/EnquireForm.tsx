@@ -111,7 +111,7 @@ export function EnquireForm() {
 
     const subject = encodeURIComponent(`Aulawell enquiry from ${form.name}`)
     const emailBody = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nEnquiry about: ${form.topic}\nLearner stage: ${form.stage}\nLocation / time zone: ${form.location}\n\n${form.message}`
+      `Name: ${form.name}\nEmail: ${form.email}\nWhatsApp: ${form.phone}\nEnquiry about: ${form.topic}\nLearner stage: ${form.stage}\nLocation / time zone: ${form.location}\n\n${form.message}`
     )
     window.location.href = `mailto:${CONTACT_INFO.EMAIL}?subject=${subject}&body=${emailBody}`
     setStatus("idle")
@@ -160,9 +160,17 @@ export function EnquireForm() {
         </div>
         <div>
           <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-navy">
-            Phone / WhatsApp
+            WhatsApp number
           </label>
-          <input id="phone" name="phone" type="tel" value={form.phone} onChange={update} className={fieldClass} />
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            value={form.phone}
+            onChange={update}
+            placeholder="So we can reach you on WhatsApp"
+            className={fieldClass}
+          />
         </div>
         <div>
           <label htmlFor="topic" className="mb-1.5 block text-sm font-medium text-navy">

@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   
+  // The old contact form has been replaced by /enquire (WhatsApp + email
+  // only, no phone number). Redirect any existing links/bookmarks.
+  async redirects() {
+    return [
+      {
+        source: "/contact",
+        destination: "/enquire",
+        permanent: true,
+      },
+    ]
+  },
+
   // Headers for security and performance
   async headers() {
     return [

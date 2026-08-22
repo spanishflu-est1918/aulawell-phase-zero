@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Phone, Mail, MapPin } from "lucide-react"
+import { MessageCircle, Mail, MapPin } from "lucide-react"
 import { CONTACT_INFO } from "@/lib/constants"
 
 const paymentLogos = [
@@ -60,9 +60,14 @@ export function Footer() {
             </h4>
             <ul className="mt-4 space-y-3 text-sm">
               <li className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 text-white/50" />
-                <a href={CONTACT_INFO.PHONE_HREF} className="text-white/75 transition-colors hover:text-white">
-                  {CONTACT_INFO.PHONE_DISPLAY}
+                <MessageCircle className="h-4 w-4 text-white/50" />
+                <a
+                  href={`https://wa.me/${CONTACT_INFO.WHATSAPP_NUMBER}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/75 transition-colors hover:text-white"
+                >
+                  WhatsApp
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
@@ -128,7 +133,7 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-3 text-sm text-white/60 sm:flex-row">
             <p>&copy; {new Date().getFullYear()} Aulawell. All rights reserved.</p>
             <div className="flex items-center gap-5">
-              <FooterLink href="/contact">Contact</FooterLink>
+              <FooterLink href="/enquire">Enquire</FooterLink>
               <FooterLink href="/privacy-policy">Privacy</FooterLink>
               <FooterLink href="/terms">Terms</FooterLink>
             </div>

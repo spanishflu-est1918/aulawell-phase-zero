@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { Mail, MessageCircle, Phone, Check } from "lucide-react"
+import { Mail, MessageCircle, Check } from "lucide-react"
 import { Eyebrow } from "@/components/marketing/Eyebrow"
 import { EnquireForm } from "@/components/marketing/EnquireForm"
 import { CONTACT_INFO } from "@/lib/constants"
@@ -83,12 +83,6 @@ export default function EnquirePage() {
                   <Mail className="h-5 w-5 text-gold-ink" />
                   <a href={`mailto:${CONTACT_INFO.EMAIL}`} className="text-ink hover:text-navy">
                     {CONTACT_INFO.EMAIL}
-                  </a>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-gold-ink" />
-                  <a href={CONTACT_INFO.PHONE_HREF} className="text-ink hover:text-navy">
-                    {CONTACT_INFO.PHONE_DISPLAY}
                   </a>
                 </li>
               </ul>
