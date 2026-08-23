@@ -5,12 +5,9 @@
 // (service pages, homepage package overview, checkout educator step). Prices
 // are shown as "From" figures per the brief.
 //
-// NOTE ON THE LIVE CHECKOUT: the working Stripe checkout amounts still live in
-// lib/booking/config.ts (currently EUR). Reconciling the live charged amount
-// with these GBP "From" prices is a deliberate, separately-tested step and must
-// not be done by silently editing the payment config. Until then, treat these
-// as the published starting prices and confirm the charged amount at the
-// booking/checkout wiring stage.
+// The live Stripe checkout (lib/booking/config.ts) charges in GBP and its
+// bundle discounts are tuned to match these "From" prices exactly — see the
+// comment on bundleUnitCents() there. Keep the two in sync if either changes.
 // ---------------------------------------------------------------------------
 
 export const CURRENCY_SYMBOL = "£"
