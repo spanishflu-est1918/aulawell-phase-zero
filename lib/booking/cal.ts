@@ -23,6 +23,12 @@ export function isTierConfigured(tier: TutorTier): boolean {
   return Boolean(process.env.CAL_API_KEY && eventTypeIdFor(tier))
 }
 
+// Free 30-minute consultation — a separate Cal.com event type from the paid
+// lesson tiers above, with no Stripe step at all.
+export function isConsultationConfigured(): boolean {
+  return Boolean(process.env.CAL_API_KEY && process.env.CAL_EVENT_TYPE_ID_CONSULTATION)
+}
+
 function calHeaders(apiVersion: string): HeadersInit {
   return {
     Authorization: `Bearer ${process.env.CAL_API_KEY}`,
@@ -31,17 +37,13 @@ function calHeaders(apiVersion: string): HeadersInit {
   }
 }
 
-/**
- * Available slots between two UTC instants, as returned by Cal.com:
- * a map of date (YYYY-MM-DD, in BOOKING_TIMEZONE) to slot start times.
- */
-export async function fetchSlots(
+async function fetchSlotsForEventType(
+  eventTypeId: string,
   startISO: string,
-  endISO: string,
-  tier: TutorTier = "head"
+  endISO: string
 ): Promise<Record<string, string[]>> {
   const params = new URLSearchParams({
-    eventTypeId: eventTypeIdFor(tier) as string,
+    eventTypeId,
     start: startISO,
     end: endISO,
     timeZone: BOOKING_TIMEZONE,
@@ -61,6 +63,30 @@ export async function fetchSlots(
     slots[date] = times.map((t) => (typeof t === "string" ? t : t.start))
   }
   return slots
+}
+
+/**
+ * Available slots between two UTC instants, as returned by Cal.com:
+ * a map of date (YYYY-MM-DD, in BOOKING_TIMEZONE) to slot start times.
+ */
+export async function fetchSlots(
+  startISO: string,
+  endISO: string,
+  tier: TutorTier = "head"
+): Promise<Record<string, string[]>> {
+  return fetchSlotsForEventType(eventTypeIdFor(tier) as string, startISO, endISO)
+}
+
+// Same as fetchSlots, but for the free consultation event type.
+export async function fetchConsultationSlots(
+  startISO: string,
+  endISO: string
+): Promise<Record<string, string[]>> {
+  return fetchSlotsForEventType(
+    process.env.CAL_EVENT_TYPE_ID_CONSULTATION as string,
+    startISO,
+    endISO
+  )
 }
 
 export interface BookingAttendee {
@@ -99,17 +125,17 @@ export async function fetchPastBookings(afterStartISO: string): Promise<CalBooki
   return Array.isArray(json.data) ? json.data : []
 }
 
-export async function createBooking(
+async function createBookingForEventType(
+  eventTypeId: string,
   startUtcISO: string,
   attendee: BookingAttendee,
-  metadata: Record<string, string> = {},
-  tier: TutorTier = "head"
+  metadata: Record<string, string> = {}
 ): Promise<{ ok: boolean; error?: string }> {
   const res = await fetch(`${CAL_API_BASE}/bookings`, {
     method: "POST",
     headers: calHeaders(BOOKINGS_API_VERSION),
     body: JSON.stringify({
-      eventTypeId: Number(eventTypeIdFor(tier)),
+      eventTypeId: Number(eventTypeId),
       start: startUtcISO,
       attendee: {
         name: attendee.name,
@@ -129,4 +155,32 @@ export async function createBooking(
     // keep the status-based detail
   }
   return { ok: false, error: detail }
+}
+
+export async function createBooking(
+  startUtcISO: string,
+  attendee: BookingAttendee,
+  metadata: Record<string, string> = {},
+  tier: TutorTier = "head"
+): Promise<{ ok: boolean; error?: string }> {
+  return createBookingForEventType(
+    eventTypeIdFor(tier) as string,
+    startUtcISO,
+    attendee,
+    metadata
+  )
+}
+
+// Same as createBooking, but for the free consultation event type.
+export async function createConsultationBooking(
+  startUtcISO: string,
+  attendee: BookingAttendee,
+  metadata: Record<string, string> = {}
+): Promise<{ ok: boolean; error?: string }> {
+  return createBookingForEventType(
+    process.env.CAL_EVENT_TYPE_ID_CONSULTATION as string,
+    startUtcISO,
+    attendee,
+    metadata
+  )
 }

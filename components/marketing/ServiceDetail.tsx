@@ -166,7 +166,7 @@ export function ServiceDetail({ service }: { service: Service }) {
                   enquiry.
                 </p>
                 <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-                  <Link href="/book?service=university-applications" className={ctaPrimary}>
+                  <Link href="/consultation" className={ctaPrimary}>
                     Book a Consultation
                   </Link>
                   <Link href="/enquire" className={ctaSecondary}>
