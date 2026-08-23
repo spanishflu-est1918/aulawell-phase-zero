@@ -19,14 +19,13 @@ export interface TierInfo {
 }
 
 // Prices are in the smallest GBP unit (pence). Single-lesson "from" prices:
-// Aulawell Tutor £35, Head Tutor Amy £40. (Exam-specialist Head Tutor work is
-// £45 — applied via service context / rate code, see rates.ts.)
+// Aulawell Tutor £35, Head Tutor Amy £45 (flat across every service).
 export const TUTOR_TIERS: Record<TutorTier, TierInfo> = {
   head: {
     label: "Head Tutor — Amy",
     description:
       "Premium 1:1 online tuition with Aulawell's Founder and Academic Director",
-    priceCents: 4000,
+    priceCents: 4500,
   },
   associate: {
     label: "Aulawell Tutor",
@@ -50,8 +49,8 @@ export function isTutorTier(value: unknown): value is TutorTier {
 // Bundle pricing: booking several lessons in one checkout lowers the per-lesson
 // price. Tuned to the brief's package "from" prices, and used by the UI,
 // checkout and webhook alike so displayed and charged amounts can never differ:
-//   5 lessons  → -£2 per lesson   (e.g. £35 → £33 = £165; £40 → £38 = £190)
-//   10 lessons → 20% off          (e.g. £35 → £28 = £280; £40 → £32 = £320)
+//   5 lessons  → -£2 per lesson   (e.g. £35 → £33 = £165; £45 → £43 = £215)
+//   10 lessons → 20% off          (e.g. £35 → £28 = £280; £45 → £36 = £360)
 export function bundleUnitCents(unitCents: number, lessonCount: number): number {
   if (lessonCount >= 10) return Math.round(unitCents * 0.8)
   if (lessonCount >= 5) return unitCents - 200

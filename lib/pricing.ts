@@ -34,7 +34,7 @@ export const EDUCATOR_LEVELS: EducatorLevel[] = [
   {
     id: "head-tutor",
     name: "Head Tutor — Amy",
-    fromLabel: "from £40",
+    fromLabel: "from £45",
     description:
       "Premium support delivered directly by Aulawell's Founder and Academic Director.",
   },
@@ -55,7 +55,7 @@ export const AULAWELL_TUTOR_PRICES: PriceRow[] = [
 ]
 
 export const HEAD_TUTOR_PRICES: PriceRow[] = [
-  { service: "School English", single: 40, five: 190, ten: 320 },
+  { service: "School English", single: 45, five: 215, ten: 360 },
   { service: "Exam English", single: 45, five: 215, ten: 360 },
 ]
 

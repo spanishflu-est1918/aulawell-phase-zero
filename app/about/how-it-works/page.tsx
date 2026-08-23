@@ -34,7 +34,7 @@ const steps = [
   {
     step: "03",
     title: "Choose your educator level",
-    body: "An Aulawell Tutor from £35, or Head Tutor Amy from £40.",
+    body: "An Aulawell Tutor from £35, or Head Tutor Amy from £45.",
   },
   {
     step: "04",

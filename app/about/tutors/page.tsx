@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import type { Metadata } from "next"
 import { ShieldCheck, BadgeCheck, UserCheck, CalendarClock } from "lucide-react"
 import { FadeIn } from "@/components/ui/fade-in"
@@ -54,8 +55,20 @@ export default function TutorsPage() {
     <div className="bg-cream">
       {/* Hero */}
       <section className="border-b border-navy/10 bg-cream-panel/40">
-        <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="mx-auto grid max-w-[1100px] items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-8 lg:py-20">
           <FadeIn>
+            <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] rounded-tr-[5rem] shadow-xl shadow-navy/15">
+              <Image
+                src="/amy-tutor.jpeg"
+                alt="Amy, Aulawell's Founder and Academic Director"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                priority
+              />
+            </div>
+          </FadeIn>
+          <FadeIn delay={150}>
             <Eyebrow>Meet the Tutors</Eyebrow>
             <h1 className="mt-6 max-w-3xl font-serif text-4xl leading-[1.1] tracking-tight text-navy sm:text-5xl">
               Led by Amy. Delivered by carefully selected tutors.

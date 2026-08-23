@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
 
   // Family rates apply to Head Tutor lessons only; families with a negotiated
   // rate don't get the bundle discount stacked on top of it.
-  const baseUnit = unitRateFor(tier, rateCode, service)
+  const baseUnit = unitRateFor(tier, rateCode)
   const unitAmount = hasCustomRate(tier, rateCode)
     ? baseUnit
     : bundleUnitCents(baseUnit, slots.length)

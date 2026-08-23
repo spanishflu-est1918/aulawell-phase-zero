@@ -13,9 +13,8 @@ export async function GET(req: NextRequest) {
   const rate = req.nextUrl.searchParams.get("rate")
   const tierParam = req.nextUrl.searchParams.get("tier")
   const tier = isTutorTier(tierParam) ? tierParam : DEFAULT_TIER
-  const service = req.nextUrl.searchParams.get("service")
 
-  const priceCents = unitRateFor(tier, rate, service)
+  const priceCents = unitRateFor(tier, rate)
   const customRate = hasCustomRate(tier, rate)
   // Post-pay (and family rates generally) only apply to Head Tutor lessons.
   const postPay = tier === "head" && isPostPayCode(rate)

@@ -31,32 +31,11 @@ export function hasCustomRate(tier: TutorTier, code?: string | null): boolean {
   return tier === "head" && familyRate(code)?.cents !== undefined
 }
 
-// Head Tutor (Amy) charges more for exam-specialist work than for school
-// English, per the published pricing table (School £40 / Exam £45 single
-// lesson). Every other service uses the standard Head Tutor base price.
-// Keyed by the service slug used in lib/services-content.ts and passed
-// through the booking flow as ?service=...
-const HEAD_TIER_SERVICE_OVERRIDES_CENTS: Record<string, number> = {
-  "exam-academic-english": 4500,
-}
-
-function headTierBaseCents(service?: string | null): number {
-  if (service && HEAD_TIER_SERVICE_OVERRIDES_CENTS[service] !== undefined) {
-    return HEAD_TIER_SERVICE_OVERRIDES_CENTS[service]
-  }
-  return TUTOR_TIERS.head.priceCents
-}
-
-// Per-lesson price in cents before any bundle discount. `service` only
-// affects Head Tutor pricing (see above) and is otherwise ignored — the
-// Aulawell Tutor rate is the same across School and Exam English.
-export function unitRateFor(
-  tier: TutorTier,
-  code?: string | null,
-  service?: string | null
-): number {
+// Per-lesson price in cents before any bundle discount. Head Tutor is a flat
+// £45 across every service.
+export function unitRateFor(tier: TutorTier, code?: string | null): number {
   if (tier === "head") {
-    return familyRate(code)?.cents ?? headTierBaseCents(service)
+    return familyRate(code)?.cents ?? TUTOR_TIERS.head.priceCents
   }
   return TUTOR_TIERS[tier].priceCents
 }

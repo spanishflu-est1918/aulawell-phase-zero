@@ -51,10 +51,9 @@ export async function POST(req: NextRequest) {
   const phone = meta.student_whatsapp || undefined
   const whatsappConsent = meta.whatsapp_consent === "1"
   const tier = isTutorTier(meta.tier) ? meta.tier : DEFAULT_TIER
-  const service = meta.service || undefined
   // Recompute the price exactly as checkout did (tier price or family rate,
   // then bundle discount) so a tampered session can never verify.
-  const baseUnit = unitRateFor(tier, meta.rate_code, service)
+  const baseUnit = unitRateFor(tier, meta.rate_code)
   const expectedUnit = hasCustomRate(tier, meta.rate_code)
     ? baseUnit
     : bundleUnitCents(baseUnit, slots.length)
