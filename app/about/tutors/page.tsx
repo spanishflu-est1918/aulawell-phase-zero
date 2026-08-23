@@ -5,6 +5,8 @@ import { ShieldCheck, BadgeCheck, UserCheck, CalendarClock } from "lucide-react"
 import { FadeIn } from "@/components/ui/fade-in"
 import { Eyebrow } from "@/components/marketing/Eyebrow"
 import { EducatorLevels } from "@/components/marketing/EducatorLevels"
+import { TeamGrid } from "@/components/marketing/TeamGrid"
+import { ENGLISH_TUTORS, UNIVERSITY_SPECIALISTS } from "@/lib/team-content"
 import { ctaOnNavy, ctaOnNavyGhost } from "@/lib/ui"
 
 export const metadata: Metadata = {
@@ -101,6 +103,40 @@ export default function TutorsPage() {
                 </div>
               </FadeIn>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* English tutors */}
+      <section className="bg-cream-panel/40 py-16 sm:py-20">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow className="justify-center">English tutors</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Meet the team
+            </h2>
+          </FadeIn>
+          <div className="mt-12">
+            <TeamGrid members={ENGLISH_TUTORS} />
+          </div>
+        </div>
+      </section>
+
+      {/* University application specialists */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow className="justify-center">University applications</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Specialist advisors
+            </h2>
+            <p className="mt-4 text-ink-soft">
+              For UCAS and US university applications, learners work with a
+              dedicated specialist alongside their English tuition.
+            </p>
+          </FadeIn>
+          <div className="mt-12">
+            <TeamGrid members={UNIVERSITY_SPECIALISTS} />
           </div>
         </div>
       </section>
