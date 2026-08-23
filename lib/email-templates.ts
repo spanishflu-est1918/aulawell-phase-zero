@@ -69,3 +69,21 @@ export function bookingConfirmation(input: {
   const text = `Hi ${firstName},\n\nThank you — your booking is confirmed with ${input.educatorLabel}.\n\n${input.lessonLines.join("\n")}\n\nAmount paid: ${input.amountLabel}\n\nCal.com has sent a separate calendar invite for each lesson with the joining details.\n\nNeed to reschedule? Reply to this email or WhatsApp us: ${waLink}`
   return { subject, html, text }
 }
+
+// ---------------------------------------------------------------------------
+// Rebook nudge — sent when a student/group has exactly 1 lesson left in
+// their current package, to invite booking the next one before it runs out.
+// ---------------------------------------------------------------------------
+export function rebookNudge(input: {
+  studentGroupName: string
+}): { subject: string; html: string; text: string } {
+  const subject = `Just one lesson left — book ${input.studentGroupName}'s next package`
+  const html = emailShell(`
+    <p style="margin:0 0 16px;">Hi there,</p>
+    <p style="margin:0 0 16px;">Just a heads up — ${input.studentGroupName} has <strong>one lesson remaining</strong> in their current package with Aulawell.</p>
+    <p style="margin:0 0 16px;">To keep lessons running without a gap, let us know if you'd like to book the next package. You can reply to this email or message us directly and we'll get it sorted.</p>
+    <p style="margin:0;"><a href="${waLink}" style="color:#13283f;font-weight:600;">Message on WhatsApp</a></p>
+  `)
+  const text = `Hi there,\n\nJust a heads up — ${input.studentGroupName} has one lesson remaining in their current package with Aulawell.\n\nTo keep lessons running without a gap, let us know if you'd like to book the next package — reply to this email or WhatsApp us: ${waLink}`
+  return { subject, html, text }
+}
