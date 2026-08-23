@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { createLead } from "@/lib/airtable"
 import { notifyOwner } from "@/lib/booking/notify"
 import { normalizeWhatsApp } from "@/lib/phone"
+import { sendParentEmail } from "@/lib/email"
+import { enquiryAcknowledgement } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
 
@@ -60,6 +62,9 @@ export async function POST(req: NextRequest) {
     message || "(no message)",
   ].filter(Boolean)
   await notifyOwner(`New Aulawell enquiry — ${topic || "General"}`, lines.join("\n"))
+
+  // 3) Acknowledge to the parent — fail-soft, never blocks the enquiry.
+  await sendParentEmail({ to: email, ...enquiryAcknowledgement(name) })
 
   return NextResponse.json({ ok: true })
 }

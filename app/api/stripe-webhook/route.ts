@@ -14,6 +14,8 @@ import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { hasCustomRate, unitRateFor } from "@/lib/booking/rates"
 import { getStripe } from "@/lib/booking/stripe"
 import { createBookingRecord, checkTenLessonCustomerType } from "@/lib/airtable"
+import { sendParentEmail } from "@/lib/email"
+import { bookingConfirmation } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
 
@@ -186,6 +188,21 @@ export async function POST(req: NextRequest) {
       stripeSessionId: session.id,
       customerType,
     })
+
+    // Confirm to the parent — fail-soft, never affects fulfilment. Only the
+    // lessons that actually succeeded (failed ones were auto-refunded above
+    // and shouldn't be presented as booked).
+    if (email) {
+      await sendParentEmail({
+        to: email,
+        ...bookingConfirmation({
+          name,
+          educatorLabel: TUTOR_TIERS[tier].label,
+          amountLabel: formatPrice(session.amount_total ?? 0),
+          lessonLines: booked.map(describeSlot),
+        }),
+      })
+    }
   }
 
   return NextResponse.json({ received: true })

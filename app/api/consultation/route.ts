@@ -3,6 +3,8 @@ import { createConsultationBooking, fetchConsultationSlots, isConsultationConfig
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { createLead } from "@/lib/airtable"
 import { normalizeWhatsApp } from "@/lib/phone"
+import { sendParentEmail } from "@/lib/email"
+import { consultationConfirmation } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
 
@@ -120,6 +122,12 @@ export async function POST(req: NextRequest) {
       .filter(Boolean)
       .join("\n")
   )
+
+  // Confirm to the parent — fail-soft, never blocks the booking.
+  await sendParentEmail({
+    to: email,
+    ...consultationConfirmation({ name, whenLabel: describeSlot(slotUtc) }),
+  })
 
   return NextResponse.json({ ok: true })
 }
