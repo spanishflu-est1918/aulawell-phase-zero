@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { WhatsAppField } from "@/components/marketing/WhatsAppField"
+import { isValidWhatsApp } from "@/lib/phone"
 import {
   BOOKING_TIMEZONE,
   DEFAULT_TIER,
@@ -84,6 +86,8 @@ export default function BookingCalendar() {
   const [selected, setSelected] = useState<string[]>([])
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [whatsappConsent, setWhatsappConsent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState("")
 
@@ -159,6 +163,10 @@ export default function BookingCalendar() {
       setSubmitError("Please enter your name and email so we can confirm your lessons.")
       return
     }
+    if (phone.trim() && isValidWhatsApp(phone) && !whatsappConsent) {
+      setSubmitError("Please confirm you're happy to be contacted on WhatsApp, or leave the number blank.")
+      return
+    }
     setSubmitting(true)
     try {
       const res = await fetch("/api/checkout", {
@@ -168,6 +176,8 @@ export default function BookingCalendar() {
           slots: selected,
           name,
           email,
+          phone: phone || undefined,
+          whatsappConsent,
           rate: rate || undefined,
           tier,
           service: service || undefined,
@@ -444,6 +454,13 @@ export default function BookingCalendar() {
                 placeholder="Email address"
                 aria-label="Email address"
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy"
+              />
+              <WhatsAppField
+                phone={phone}
+                onPhoneChange={setPhone}
+                consent={whatsappConsent}
+                onConsentChange={setWhatsappConsent}
+                idPrefix="booking-whatsapp"
               />
               <Button onClick={handleCheckout} disabled={submitting} className="w-full">
                 {submitting ? (

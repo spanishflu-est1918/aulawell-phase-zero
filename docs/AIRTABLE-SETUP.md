@@ -38,19 +38,24 @@ by email — they simply are not written to Airtable.
 Written by the enquiry form (`/enquire` → `/api/enquire`). Default table name:
 `Website Leads` (id `tblnGCUZc49JKhG5W`). Override with `AIRTABLE_LEADS_TABLE`.
 
-| Column          | Type                | Notes / options |
-| --------------- | ------------------- | --------------- |
-| `Name`          | Single line text    | |
-| `Email`         | Email               | |
-| `Phone`         | Phone number        | |
-| `Enquiry About` | Single select       | Not sure which service fits · School English · Exam & Academic English · English Qualifications (IELTS / Cambridge) · University Applications · In-person tuition (Madrid / Lisbon) · Complex or additional learning needs · School or agency partnership · Aulawell Hub / Reading Hub waitlist |
-| `Learner Stage` | Single select       | KS2 · KS3 (Years 7–9) · US Middle School (Grades 6–8) · GCSE / IGCSE · A Level / IB / MYP · IELTS / Cambridge · University applications · Adult learner · Other |
-| `Location`      | Single line text    | Location / time zone |
-| `Message`       | Long text           | |
-| `Source`        | Single select       | Website enquiry · Website booking |
-| `Status`        | Single select       | New · Contacted · Converted · Closed |
-| `Created`       | Created time        | Automatic — optional |
+| Column              | Type              | Notes / options |
+| ------------------- | ----------------- | --------------- |
+| `Name`               | Single line text  | |
+| `Email`               | Email             | |
+| `WhatsApp`            | Phone number      | Cleaned/normalized before writing — see `lib/phone.ts` |
+| `WhatsApp Consent`    | Checkbox          | True only if the visitor explicitly opted in |
+| `Enquiry About`       | Single select     | Not sure which service fits · School English · Exam & Academic English · English Qualifications (IELTS / Cambridge) · University Applications · In-person tuition (Madrid / Lisbon) · Complex or additional learning needs · School or agency partnership · Aulawell Hub / Reading Hub waitlist |
+| `Learner Stage`       | Single select     | KS2 · KS3 (Years 7–9) · US Middle School (Grades 6–8) · GCSE / IGCSE · A Level / IB / MYP · IELTS / Cambridge · University applications · Adult learner · Other |
+| `Location`            | Single line text  | Location / time zone |
+| `Message`             | Long text         | |
+| `Source`              | Single select     | Website enquiry · Website booking · Consultation booking |
+| `Status`              | Single select     | New · Contacted · Converted · Closed |
+| `Created`             | Formula (`CREATED_TIME()`) | Native `createdTime` fields can't be created via the API, so this is a formula field instead — behaves the same for sorting/filtering |
 
+> `Phone (legacy, unused — see WhatsApp)` still exists as a single-line-text
+> field from before the schema fix — it was mistyped and is no longer written
+> to. Safe to delete manually in the Airtable UI (the API can't delete fields).
+>
 > Single-select options are created automatically on first write (the API uses
 > `typecast`), so you only need the **columns** to exist with the right names.
 
@@ -62,18 +67,22 @@ Written by the Stripe webhook (`/api/stripe-webhook`) after a successful, paid
 booking. Default table name: `Website Bookings` (id `tblaMd8QDAYgF4CkU`).
 Override with `AIRTABLE_PACKAGES_TABLE`.
 
-| Column           | Type             | Notes / options |
-| ---------------- | ---------------- | --------------- |
-| `Name`           | Single line text | |
-| `Email`          | Email            | |
-| `Educator`       | Single select    | Aulawell Tutor · Head Tutor — Amy · In person — Aulawell Tutor |
-| `Amount Paid`    | Currency (GBP)   | Stored as pounds (e.g. 280.00) |
-| `Currency`       | Single line text | e.g. GBP |
-| `Lessons Booked` | Number (integer) | |
-| `Lesson Dates`   | Long text        | One ISO datetime per line |
-| `Stripe Session` | Single line text | Stripe Checkout session id |
-| `Status`         | Single select    | Paid · Scheduled · Completed |
-| `Source`         | Single select    | Website booking |
+| Column              | Type             | Notes / options |
+| ------------------- | ---------------- | --------------- |
+| `Name`               | Single line text | |
+| `Email`               | Email            | |
+| `WhatsApp`            | Phone number     | Cleaned/normalized before writing — see `lib/phone.ts` |
+| `WhatsApp Consent`    | Checkbox         | True only if the payer explicitly opted in |
+| `Educator`            | Single select    | Aulawell Tutor · Head Tutor — Amy · In person — Aulawell Tutor |
+| `Amount Paid`         | Currency (GBP)   | Stored as pounds (e.g. 280.00) |
+| `Currency`            | Single line text | e.g. GBP |
+| `Lessons Booked`      | Number (integer) | |
+| `Lesson Dates`        | Long text        | One ISO datetime per line |
+| `Stripe Session`      | Single line text | Stripe Checkout session id |
+| `Status`              | Single select    | Paid · Scheduled · Completed |
+| `Source`              | Single select    | Website booking |
+| `Customer Type`       | Single select    | New · Returning — review 20% offer · Unknown — check manually |
+| `Created`             | Formula (`CREATED_TIME()`) | See note under Leads above |
 
 ---
 

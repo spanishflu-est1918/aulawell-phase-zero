@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { CONTACT_INFO, WEB3FORMS_ACCESS_KEY } from "@/lib/constants"
+import { WhatsAppField } from "@/components/marketing/WhatsAppField"
+import { isValidWhatsApp } from "@/lib/phone"
 
 const TOPICS = [
   "Not sure which service fits",
@@ -52,12 +54,14 @@ export function EnquireForm() {
     name: "",
     email: "",
     phone: "",
+    whatsappConsent: false,
     topic: defaultTopic(params.get("interest"), params.get("service")),
     stage: "",
     location: "",
     message: "",
   })
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
+  const [consentError, setConsentError] = useState("")
 
   function update(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -67,6 +71,11 @@ export function EnquireForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setConsentError("")
+    if (form.phone.trim() && isValidWhatsApp(form.phone) && !form.whatsappConsent) {
+      setConsentError("Please confirm you're happy to be contacted on WhatsApp, or leave the number blank.")
+      return
+    }
     setStatus("sending")
 
     // Primary path: our server route records the enquiry in Airtable and sends
@@ -81,7 +90,7 @@ export function EnquireForm() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.ok) throw new Error("submit failed")
       setStatus("success")
-      setForm({ name: "", email: "", phone: "", topic: "", stage: "", location: "", message: "" })
+      setForm({ name: "", email: "", phone: "", whatsappConsent: false, topic: "", stage: "", location: "", message: "" })
       return
     } catch {
       // Fall through to the client-side fallback below.
@@ -102,7 +111,7 @@ export function EnquireForm() {
         const data = await res.json()
         if (!res.ok || !data.success) throw new Error("submit failed")
         setStatus("success")
-        setForm({ name: "", email: "", phone: "", topic: "", stage: "", location: "", message: "" })
+        setForm({ name: "", email: "", phone: "", whatsappConsent: false, topic: "", stage: "", location: "", message: "" })
         return
       } catch {
         // fall through to mailto
@@ -158,20 +167,13 @@ export function EnquireForm() {
           </label>
           <input id="email" name="email" type="email" required value={form.email} onChange={update} className={fieldClass} />
         </div>
-        <div>
-          <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-navy">
-            WhatsApp number
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={form.phone}
-            onChange={update}
-            placeholder="So we can reach you on WhatsApp"
-            className={fieldClass}
-          />
-        </div>
+        <WhatsAppField
+          phone={form.phone}
+          onPhoneChange={(v) => setForm({ ...form, phone: v })}
+          consent={form.whatsappConsent}
+          onConsentChange={(v) => setForm({ ...form, whatsappConsent: v })}
+          idPrefix="phone"
+        />
         <div>
           <label htmlFor="topic" className="mb-1.5 block text-sm font-medium text-navy">
             What are you enquiring about? *
@@ -227,6 +229,12 @@ export function EnquireForm() {
           className={fieldClass}
         />
       </div>
+
+      {consentError && (
+        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {consentError}
+        </p>
+      )}
 
       <button
         type="submit"

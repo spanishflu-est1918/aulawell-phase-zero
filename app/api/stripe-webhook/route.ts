@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
   const slots = (meta.slots ?? "").split(",").filter(Boolean)
   const name = meta.student_name ?? "Unknown"
   const email = meta.student_email ?? session.customer_email ?? ""
+  const phone = meta.student_whatsapp || undefined
+  const whatsappConsent = meta.whatsapp_consent === "1"
   const tier = isTutorTier(meta.tier) ? meta.tier : DEFAULT_TIER
   const service = meta.service || undefined
   // Recompute the price exactly as checkout did (tier price or family rate,
@@ -175,6 +177,8 @@ export async function POST(req: NextRequest) {
     await createBookingRecord({
       name,
       email,
+      phone,
+      whatsappConsent,
       tierLabel: TUTOR_TIERS[tier].label,
       amountPaidPence: session.amount_total ?? 0,
       currency: session.currency ?? CURRENCY,

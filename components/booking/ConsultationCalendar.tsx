@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { WhatsAppField } from "@/components/marketing/WhatsAppField"
+import { isValidWhatsApp } from "@/lib/phone"
 import { BOOKING_TIMEZONE } from "@/lib/booking/config"
 
 interface SlotsResponse {
@@ -56,6 +58,7 @@ export default function ConsultationCalendar() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
+  const [whatsappConsent, setWhatsappConsent] = useState(false)
   const [stage, setStage] = useState("")
   const [topic, setTopic] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -106,12 +109,16 @@ export default function ConsultationCalendar() {
       setSubmitError("Please choose a time.")
       return
     }
+    if (phone.trim() && isValidWhatsApp(phone) && !whatsappConsent) {
+      setSubmitError("Please confirm you're happy to be contacted on WhatsApp, or leave the number blank.")
+      return
+    }
     setSubmitting(true)
     try {
       const res = await fetch("/api/consultation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slot: selected, name, email, phone, stage, topic }),
+        body: JSON.stringify({ slot: selected, name, email, phone, whatsappConsent, stage, topic }),
       })
       const data: { ok?: boolean; error?: string } = await res.json()
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Could not book that time")
@@ -268,7 +275,13 @@ export default function ConsultationCalendar() {
         <div className="space-y-3">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" aria-label="Name" className={fieldClass} />
           <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email address" aria-label="Email address" className={fieldClass} />
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="WhatsApp number" aria-label="WhatsApp number" className={fieldClass} />
+          <WhatsAppField
+            phone={phone}
+            onPhoneChange={setPhone}
+            consent={whatsappConsent}
+            onConsentChange={setWhatsappConsent}
+            idPrefix="consultation-whatsapp"
+          />
           <select value={stage} onChange={(e) => setStage(e.target.value)} aria-label="Learner stage" className={fieldClass}>
             <option value="">Learner stage (optional)</option>
             {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}

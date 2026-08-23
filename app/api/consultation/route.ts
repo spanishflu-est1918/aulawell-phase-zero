@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createConsultationBooking, fetchConsultationSlots, isConsultationConfigured } from "@/lib/booking/cal"
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { createLead } from "@/lib/airtable"
+import { normalizeWhatsApp } from "@/lib/phone"
 
 export const dynamic = "force-dynamic"
 
@@ -10,6 +11,7 @@ interface ConsultationBody {
   name?: unknown
   email?: unknown
   phone?: unknown
+  whatsappConsent?: unknown
   stage?: unknown
   topic?: unknown
 }
@@ -35,7 +37,10 @@ export async function POST(req: NextRequest) {
 
   const name = str(body.name)
   const email = str(body.email)
-  const phone = str(body.phone)
+  // Never store an unconfirmed number, and never store one that isn't
+  // dialable — a normalization failure is treated the same as "not given".
+  const whatsappConsent = body.whatsappConsent === true
+  const phone = whatsappConsent ? normalizeWhatsApp(str(body.phone)) : ""
   const stage = str(body.stage)
   const topic = str(body.topic)
   const slot = str(body.slot)
@@ -96,6 +101,7 @@ export async function POST(req: NextRequest) {
     name,
     email,
     phone,
+    whatsappConsent,
     topic: topic || "Consultation",
     stage,
     message: `Free 30-minute consultation booked for ${describeSlot(slotUtc)}.`,
@@ -106,7 +112,7 @@ export async function POST(req: NextRequest) {
     "Aulawell: consultation booked",
     [
       `${name} (${email}) booked a free consultation for ${describeSlot(slotUtc)}.`,
-      phone ? `WhatsApp: ${phone}` : "",
+      phone ? `WhatsApp: ${phone} (consented)` : "",
       stage ? `Learner stage: ${stage}` : "",
       "",
       topic || "(no topic given)",

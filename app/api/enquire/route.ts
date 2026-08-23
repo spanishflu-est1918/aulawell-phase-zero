@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createLead } from "@/lib/airtable"
 import { notifyOwner } from "@/lib/booking/notify"
+import { normalizeWhatsApp } from "@/lib/phone"
 
 export const dynamic = "force-dynamic"
 
@@ -8,6 +9,7 @@ interface EnquiryBody {
   name?: unknown
   email?: unknown
   phone?: unknown
+  whatsappConsent?: unknown
   topic?: unknown
   stage?: unknown
   location?: unknown
@@ -28,7 +30,10 @@ export async function POST(req: NextRequest) {
 
   const name = str(body.name)
   const email = str(body.email)
-  const phone = str(body.phone)
+  // Never store an unconfirmed number, and never store one that isn't
+  // dialable — a normalization failure is treated the same as "not given".
+  const consent = body.whatsappConsent === true
+  const phone = consent ? normalizeWhatsApp(str(body.phone)) : ""
   const topic = str(body.topic)
   const stage = str(body.stage)
   const location = str(body.location)
@@ -42,12 +47,12 @@ export async function POST(req: NextRequest) {
   }
 
   // 1) Operational source of truth (fail-soft — never blocks the enquiry).
-  await createLead({ name, email, phone, topic, stage, location, message })
+  await createLead({ name, email, phone, whatsappConsent: consent, topic, stage, location, message })
 
   // 2) Internal notification to Aulawell (Web3Forms, same channel as contact).
   const lines = [
     `New enquiry from ${name} (${email})`,
-    phone ? `Phone: ${phone}` : "",
+    phone ? `WhatsApp: ${phone} (consented)` : "",
     topic ? `Enquiring about: ${topic}` : "",
     stage ? `Learner stage: ${stage}` : "",
     location ? `Location / time zone: ${location}` : "",

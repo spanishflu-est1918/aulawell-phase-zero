@@ -36,7 +36,8 @@ const TABLES = {
 const LEAD_FIELDS = {
   name: "Name",
   email: "Email",
-  phone: "Phone",
+  phone: "WhatsApp",
+  whatsappConsent: "WhatsApp Consent",
   topic: "Enquiry About",
   stage: "Learner Stage",
   location: "Location",
@@ -90,7 +91,10 @@ async function createRecord(
 export interface LeadInput {
   name: string
   email: string
+  // Must already be normalized (see lib/phone.ts) and only ever set when
+  // whatsappConsent is true — this module trusts its callers on that.
   phone?: string
+  whatsappConsent?: boolean
   topic?: string
   stage?: string
   location?: string
@@ -104,6 +108,7 @@ export async function createLead(lead: LeadInput): Promise<string | null> {
     [LEAD_FIELDS.name]: lead.name,
     [LEAD_FIELDS.email]: lead.email,
     [LEAD_FIELDS.phone]: lead.phone,
+    [LEAD_FIELDS.whatsappConsent]: lead.whatsappConsent ?? false,
     [LEAD_FIELDS.topic]: lead.topic,
     [LEAD_FIELDS.stage]: lead.stage,
     [LEAD_FIELDS.location]: lead.location,
@@ -116,6 +121,10 @@ export async function createLead(lead: LeadInput): Promise<string | null> {
 export interface BookingRecordInput {
   name: string
   email: string
+  // Must already be normalized (see lib/phone.ts) and only ever set when
+  // whatsappConsent is true — this module trusts its callers on that.
+  phone?: string
+  whatsappConsent?: boolean
   tierLabel: string
   amountPaidPence: number
   currency: string
@@ -140,6 +149,8 @@ export async function createBookingRecord(
   return createRecord(TABLES.packages, {
     Name: input.name,
     Email: input.email,
+    WhatsApp: input.phone,
+    "WhatsApp Consent": input.whatsappConsent ?? false,
     Educator: input.tierLabel,
     "Amount Paid": input.amountPaidPence / 100,
     Currency: input.currency.toUpperCase(),
