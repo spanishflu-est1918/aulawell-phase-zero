@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Navigation } from "@/components/layout/Navigation";
-import { ContactBar } from "@/components/layout/ContactBar";
-import { Footer } from "@/components/layout/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,14 +34,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans`}>
-        <div className="flex flex-col min-h-screen">
-          <ContactBar />
-          <Navigation />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-        </div>
-        <WhatsAppButton />
+      <body className={`${inter.variable} ${playfair.variable} font-sans overflow-x-clip`}>
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

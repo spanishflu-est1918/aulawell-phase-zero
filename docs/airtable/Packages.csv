@@ -1,0 +1,2 @@
+Name,Email,Educator,Amount Paid,Currency,Lessons Booked,Lesson Dates,Stripe Session,Status,Source
+Jane Example,jane@example.com,Aulawell Tutor,280,GBP,10,2026-09-01T10:00:00Z,cs_test_example,Paid,Website booking

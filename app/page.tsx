@@ -1,479 +1,339 @@
-import { Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import BookingCalendar from "@/components/booking/BookingCalendar"
-import Packages from "@/components/home/Packages"
-import SuccessStories from "@/components/home/SuccessStories"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GraduationCap, BookOpen, Target, Star, CheckCircle } from "lucide-react"
-import { FadeIn } from "@/components/ui/fade-in"
-import { CONTACT_INFO } from "@/lib/constants"
 import type { Metadata } from "next"
+import {
+  BookOpen,
+  GraduationCap,
+  Globe,
+  Compass,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react"
+import { FadeIn } from "@/components/ui/fade-in"
+import { Eyebrow } from "@/components/marketing/Eyebrow"
+import { Testimonials } from "@/components/marketing/Testimonials"
+import { PackageHierarchy } from "@/components/marketing/PackageHierarchy"
+import { SERVICES, CURRICULUM_STRIP, ONE_TO_ONE_NOTE } from "@/lib/services-content"
+import { ctaPrimary, ctaSecondary, ctaOnNavy, ctaOnNavyGhost } from "@/lib/ui"
 
 export const metadata: Metadata = {
-  title: "Aulawell English - Expert English Tutoring | Private & Group Classes",
-  description: "Professional English tutoring for Academic English (GCSE, A-Level, IB) and Language courses (IELTS, FCE). Private lessons and small group classes available.",
+  title: "Aulawell — Premium English Tuition for Learners With Places to Go",
+  description:
+    "Bespoke one-to-one English tuition and mentoring for British and international learners worldwide — school English, exams, IELTS and Cambridge, and university applications. Academic excellence with wellbeing built in.",
   openGraph: {
-    title: "Aulawell English - Expert English Tutoring",
-    description: "Transform your English skills with expert tutoring",
+    title: "Aulawell — English tuition for learners with places to go",
+    description:
+      "Premium, high-touch one-to-one English tuition for British and international learners worldwide.",
     type: "website",
   },
 }
 
+const serviceIcons: Record<string, typeof BookOpen> = {
+  "school-english": BookOpen,
+  "exam-academic-english": GraduationCap,
+  "english-qualifications": Globe,
+  "university-applications": Compass,
+}
+
+// The brand concept, tightened for the homepage — the fuller version lives
+// on /about. Aula (classroom, academic excellence) + Well (wellbeing,
+// confidence, resilience) is the whole positioning; keep this short.
+const aulaCopy =
+  "Spanish for classroom — rigorous, one-to-one academic support that builds real skills, from school English to the qualifications that open doors."
+const wellCopy =
+  "What makes the learning last — confidence, motivation and resilience woven into every lesson, so progress holds long after it ends."
+
+const howItWorks = [
+  { step: "01", title: "Choose your service", body: "School English, exams, English qualifications or university applications." },
+  { step: "02", title: "Choose your package", body: "A single lesson, a 5-lesson boost or 10-lesson term support." },
+  { step: "03", title: "Choose your educator", body: "An Aulawell Tutor from £35, or Head Tutor Amy directly." },
+  { step: "04", title: "Secure your place", body: "Complete a short learner profile so we can prepare properly." },
+  { step: "05", title: "Start learning", body: "Book your lessons and begin — online worldwide or in person." },
+]
+
 export default function HomePage() {
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="relative bg-navy text-white min-h-[85vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)")`}}></div>
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <FadeIn>
-                <div className="inline-flex items-center gap-2 text-gold text-sm font-semibold tracking-wider uppercase mb-6">
-                  <span className="w-12 h-px bg-gold"></span>
-                  Unlock Potential
-                </div>
-                <h1 className="text-5xl sm:text-6xl font-bold mb-6 leading-tight font-serif">
-                  Expert English Tutoring for Academic Success
-                </h1>
-              </FadeIn>
-              
-              <FadeIn delay={200}>
-                <p className="text-xl text-gray-200 mb-8">
-                  Professional English tutoring for Academic English (GCSE, A-Level, IB) and Language courses (IELTS, FCE)
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <Button asChild size="lg" className="bg-gold hover:bg-gold/90 text-navy font-semibold border-0 shadow-lg hover:shadow-xl transition-all">
-                    <Link href="/contact">Book Free Consultation</Link>
-                  </Button>
-                  <Button asChild size="lg" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg hover:shadow-xl transition-all">
-                    <a href={`https://wa.me/${CONTACT_INFO.WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
-                      WhatsApp Me
-                    </a>
-                  </Button>
-                </div>
-              </FadeIn>
+    <div className="bg-cream">
+      {/* 1 · Hero */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:py-24">
+          <div>
+            <FadeIn>
+              <Eyebrow>British &amp; International English Tuition</Eyebrow>
+              <h1 className="mt-6 font-serif text-4xl leading-[1.08] tracking-tight text-navy sm:text-5xl lg:text-6xl">
+                English tuition for learners with places to go.
+              </h1>
+            </FadeIn>
+            <FadeIn delay={150}>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink">
+                Bespoke one-to-one English support for British and international
+                learners worldwide — shaped around the curriculum, the goal and
+                what comes next.
+              </p>
+              <p className="mt-4 max-w-xl text-base text-ink-soft">
+                Premium, high-touch tuition for school English, exams and
+                international learning.
+              </p>
+            </FadeIn>
+            <FadeIn delay={300}>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link href="/book" className={ctaPrimary}>
+                  Book English Support
+                </Link>
+                <Link href="/services" className={ctaSecondary}>
+                  Explore Services
+                </Link>
+              </div>
+            </FadeIn>
+          </div>
 
-              <FadeIn delay={400}>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-gold w-5 h-5 flex-shrink-0" />
-                    <span>Expert Native English-Speaking Tutors</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-gold w-5 h-5 flex-shrink-0" />
-                    <span>Personalized Learning Plans</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="text-gold w-5 h-5 flex-shrink-0" />
-                    <span>Proven Results with High Success Rates</span>
-                  </div>
-                </div>
-              </FadeIn>
-            </div>
-
-            <FadeIn delay={200} className="relative">
-              <div className="relative h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
+          <FadeIn delay={200}>
+            <div className="relative">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] rounded-tr-[6rem] shadow-2xl shadow-navy/15">
                 <Image
                   src="/main.jpeg"
-                  alt="English tutoring student"
+                  alt="A student working one-to-one with an Aulawell tutor"
                   fill
                   className="object-cover"
                   priority
+                  sizes="(max-width: 1024px) 100vw, 45vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-navy/20 to-transparent" />
-                {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gold/20 rounded-full blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl" />
               </div>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* Outcome-number counters are held back until the real figures are
-          confirmed. To enable: set the true values in lib/site-content.ts,
-          then restore:
-            import StatsBand from "@/components/home/StatsBand"
-            <StatsBand /> (here) */}
-
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
-              Who and What We Support at Aulawell
-            </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-              We provide English tutoring for students aged 9 - 18 as well as adults all over the globe. Whether you want to enter a particular school, improve your child&apos;s confidence in English or work with a tutor for Home Education, Aulawell is here to answer your questions, mentor your child and give you peace of mind.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <FadeIn delay={100}>
-              <Card className="hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 bg-white border-navy/10">
-                <CardHeader>
-                  <div className="bg-navy/10 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                    <GraduationCap className="h-8 w-8 text-navy" />
-                  </div>
-                  <CardTitle className="text-navy text-xl">Academic English</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-6 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>11+, 12+, SATS, Common Entrance</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>General Certificate of Secondary Education (GCSEs)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>International General Certificate of Secondary Education (IGCSEs)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>A levels</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>International Baccalaureate (IB)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Exam Board expertise</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Essay Writing Support</span>
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full bg-navy hover:bg-navy/90">
-                    <Link href="/contact">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={200}>
-              <Card className="hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 bg-white border-gold/20">
-                <CardHeader>
-                  <div className="bg-gold/10 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                    <BookOpen className="h-8 w-8 text-gold" />
-                  </div>
-                  <CardTitle className="text-navy text-xl">English Language</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-6 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>General English Fluency (A1 - C1)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>First Certificate Examination (FCE)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Cambridge Advanced Examination</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>IELTS Preparation</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Business English</span>
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full bg-navy hover:bg-navy/90">
-                    <Link href="/contact">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={300}>
-              <Card className="hover:shadow-xl transition-all duration-300 h-full hover:-translate-y-1 bg-white border-green-600/20">
-                <CardHeader>
-                  <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                    <Target className="h-8 w-8 text-green-600" />
-                  </div>
-                  <CardTitle className="text-navy text-xl">Further Support</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-6 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Home Education</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Study Skills support</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Mentoring and Coaching</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>SEN Specialist support</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Personal Statement Masterclass (US, UK & AUS)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>SAT preparation (US universities)</span>
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full bg-navy hover:bg-navy/90">
-                    <Link href="/contact">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-navy/5">
-        <div className="container mx-auto px-4">
-          <FadeIn className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
-              Why Choose Aulawell?
-            </h2>
-          </FadeIn>
-
-          <div className="max-w-4xl mx-auto space-y-12">
-            <FadeIn delay={100}>
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="flex-shrink-0">
-                  <div className="bg-gold/10 rounded-full w-16 h-16 flex items-center justify-center">
-                    <GraduationCap className="h-8 w-8 text-gold" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3 text-navy">Global Expertise, Local Insight</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    With an international background and teaching experience spanning Europe, Latin America, and Asia, our tutors brings a deep cultural understanding to every lesson—helping students worldwide feel confident and supported.
-                  </p>
-                </div>
+              <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border border-navy/10 bg-white px-5 py-4 shadow-xl sm:block">
+                <p className="font-serif text-2xl text-navy">1:1</p>
+                <p className="text-xs font-medium uppercase tracking-widest text-gold-ink">
+                  Bespoke tuition
+                </p>
               </div>
-            </FadeIn>
-
-            <div className="border-t border-slate-200"></div>
-
-            <FadeIn delay={200}>
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="flex-shrink-0">
-                  <div className="bg-navy/10 rounded-full w-16 h-16 flex items-center justify-center">
-                    <Target className="h-8 w-8 text-navy" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3 text-navy">Tailored for Every Learner</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Whether you&apos;re preparing for school exams, university essays, job applications, or simply want to improve your conversational fluency, our bespoke programmes are built around you.
-                  </p>
-                </div>
-              </div>
-            </FadeIn>
-
-            <div className="border-t border-slate-200"></div>
-
-            <FadeIn delay={300}>
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="flex-shrink-0">
-                  <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center">
-                    <BookOpen className="h-8 w-8 text-green-600" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3 text-navy">Dual Specialisms = Better Results</h3>
-                  <p className="text-slate-600 leading-relaxed mb-3">
-                    You get the best of both:
-                  </p>
-                  <ul className="space-y-2 text-slate-600">
-                    <li className="flex items-start gap-2">
-                      <span className="font-semibold">Academic English</span> – critical reading, essay writing, research skills, SAT/AP/IB prep.
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="font-semibold">General English</span> – grammar, vocabulary, speaking, listening, pronunciation.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </FadeIn>
-
-            <div className="border-t border-slate-200"></div>
-
-            <FadeIn delay={400}>
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="flex-shrink-0">
-                  <div className="bg-gold/10 rounded-full w-16 h-16 flex items-center justify-center">
-                    <Star className="h-8 w-8 text-gold" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3 text-navy">Proven Track Record</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Students have earned spots at top schools and universities worldwide—including Oxford, Cambridge, Princeton, Duke—and topped language exams across multiple levels.
-                  </p>
-                </div>
-              </div>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* Class Options Section */}
-      <section className="py-20 bg-gold/5">
-        <div className="container mx-auto px-4">
-          <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
-              Tutorial Options
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              We offer a range of tutoring times and formats to accommodate our global network of families.
-            </p>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <FadeIn delay={100}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardHeader>
-                  <CardTitle className="text-navy">Face-to-Face Tuition</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-4">We provide convenient face-to-face tutoring sessions or small groups at your home. This service is only available for families and students based in Madrid, Spain.</p>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>One-to-one sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Small group sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Holiday top-up sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Holiday booster courses (2 hours a day for 3 days)</span>
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full bg-gold hover:bg-gold/90 text-white">
-                    <Link href="/contact">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={200}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardHeader>
-                  <CardTitle className="text-navy">Online Tuition</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-4">Our flagship tutoring provision for families who prefer the flexibility of online tutoring.</p>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>One-to-one sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Small group sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Holiday top-up sessions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span>Holiday booster courses (2 hours a day for 3 days)</span>
-                    </li>
-                  </ul>
-                  <Button asChild className="w-full bg-gold hover:bg-gold/90 text-white">
-                    <Link href="/contact">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={300}>
-              <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white/80">
-                <CardHeader>
-                  <CardTitle className="text-navy">Additional Support and Options</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 mb-6">If these tutoring options don&apos;t suit you or your child&apos;s needs, please contact us and we will try to accommodate your requirements.</p>
-                  <Button asChild className="w-full bg-gold hover:bg-gold/90 text-white">
-                    <Link href="/contact">Contact Us</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* Packages — prices derive from lib/booking/config.ts tier prices */}
-      <Packages />
-
-      {/* Success stories — edit content in lib/site-content.ts */}
-      <SuccessStories />
-
-      {/* Booking Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-navy mb-4 font-serif">
-                Book a Lesson
-              </h2>
-              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Pick your dates on the calendar and pay securely per lesson &mdash; it only takes a minute
-              </p>
             </div>
-            <FadeIn>
-              <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-slate-100" />}>
-                <BookingCalendar />
-              </Suspense>
-            </FadeIn>
-            <p className="mt-8 text-center text-slate-600">
-              <Link
-                href="/book"
-                className="font-medium text-navy underline underline-offset-4 transition-colors hover:text-gold"
-              >
-                How booking works
-              </Link>
-            </p>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 2 · Curriculum support strip */}
+      <section className="border-y border-navy/10 bg-cream-panel/50">
+        <div className="mx-auto grid max-w-[1280px] gap-px px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {CURRICULUM_STRIP.map((band) => (
+            <div key={band.label} className="py-6 lg:px-6 lg:text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-ink">
+                {band.label}
+              </p>
+              <p className="mt-1.5 font-serif text-lg text-navy">{band.levels}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3 · Core services */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow>How we help</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Purposeful support, shaped around where the learner is going
+            </h2>
+          </FadeIn>
+
+          <div className="mt-14 grid gap-6 md:grid-cols-2">
+            {SERVICES.map((service, i) => {
+              const Icon = serviceIcons[service.slug] ?? BookOpen
+              return (
+                <FadeIn key={service.slug} delay={i * 100}>
+                  <Link
+                    href={`/services/${service.slug}`}
+                    className="group flex h-full flex-col rounded-2xl border border-navy/12 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/10"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-cream-panel">
+                      <Icon className="h-6 w-6 text-navy" />
+                    </div>
+                    <h3 className="mt-5 font-serif text-2xl text-navy">
+                      {service.navTitle}
+                    </h3>
+                    <p className="mt-3 flex-grow text-[0.975rem] leading-relaxed text-ink-soft">
+                      {service.cardSummary}
+                    </p>
+                    <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gold-ink">
+                      Explore
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                </FadeIn>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-navy text-white">
-        <div className="container mx-auto px-4 text-center">
-          <FadeIn>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 font-serif">
-              Ready to Start Your English Learning Journey?
+      {/* 4 · Ways to learn / package overview */}
+      <section className="bg-cream-panel/40 py-20 sm:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow>Ways to work together</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Clear packages, priced from the start
             </h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Book a free consultation to discuss your goals and create a personalized learning plan
+            <p className="mt-4 text-ink-soft">{ONE_TO_ONE_NOTE}</p>
+          </FadeIn>
+
+          <div className="mt-14">
+            <PackageHierarchy />
+          </div>
+        </div>
+      </section>
+
+      {/* 5 · Why Aulawell — the brand concept, Aula + Well */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow className="justify-center">Why Aulawell</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Academic excellence, with wellbeing built in
+            </h2>
+          </FadeIn>
+
+          <div className="mt-14 grid gap-6 lg:grid-cols-2">
+            <FadeIn>
+              <div className="flex h-full flex-col rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
+                <span className="font-serif text-2xl italic text-gold-ink">Aula</span>
+                <h3 className="mt-2 font-serif text-lg text-navy">The classroom</h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">{aulaCopy}</p>
+              </div>
+            </FadeIn>
+            <FadeIn delay={120}>
+              <div className="flex h-full flex-col rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
+                <span className="font-serif text-2xl italic text-gold-ink">Well</span>
+                <h3 className="mt-2 font-serif text-lg text-navy">The wellbeing</h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">{wellCopy}</p>
+              </div>
+            </FadeIn>
+          </div>
+
+          <FadeIn delay={200} className="mt-10 text-center">
+            <p className="font-serif text-xl italic text-navy sm:text-2xl">
+              Aulawell is the classroom, made well.
             </p>
-            <Button asChild size="lg" className="bg-gold hover:bg-gold/90 text-white border-0 shadow-lg hover:shadow-xl transition-all">
-              <Link href="/contact">Get Started Today</Link>
-            </Button>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 6 · Meet the Tutors */}
+      <section className="bg-cream-panel/40 py-20 sm:py-24">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+          <FadeIn>
+            <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] rounded-bl-[6rem] shadow-xl shadow-navy/15">
+              <Image
+                src="/amy-tutor.jpeg"
+                alt="Amy, Aulawell's Founder and Academic Director"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 45vw"
+              />
+            </div>
+          </FadeIn>
+          <FadeIn delay={150}>
+            <Eyebrow>Meet the tutors</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Led by Amy. Delivered by carefully selected tutors.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-ink">
+              Aulawell is founded and led by Amy, our Founder and Academic
+              Director. Every learner is taught by a carefully selected Aulawell
+              tutor, with Amy overseeing teaching quality and tutor matching — and
+              available to teach directly as Head Tutor.
+            </p>
+            <p className="mt-4 text-ink-soft">
+              Amy retains final decision-making authority for tutor allocation,
+              availability and any special requirements, so every family is
+              matched with the right educator.
+            </p>
+            <Link href="/about/tutors" className={`${ctaSecondary} mt-8`}>
+              Meet the Tutors
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 7 · Testimonials */}
+      <Testimonials />
+
+      {/* 8 · Aulawell Hub / Sherpy vision */}
+      <section className="bg-navy py-20 text-white sm:py-24">
+        <div className="mx-auto max-w-[1100px] px-4 text-center sm:px-6 lg:px-8">
+          <FadeIn>
+            <Eyebrow onDark>Aulawell Hub · Coming Soon</Eyebrow>
+            <h2 className="mx-auto mt-5 max-w-3xl font-serif text-3xl sm:text-4xl">
+              A reading and literacy space built for progress beyond the lesson
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
+              The Aulawell Hub is a future learning platform for readers, writers
+              and English learners — combining guided reading, curriculum-aware
+              literacy support, thoughtful resources and Sherpy, Aulawell&apos;s
+              learning companion who helps learners read more, think more deeply
+              and keep moving.
+            </p>
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/aulawell-hub" className={ctaOnNavy}>
+                Explore the Aulawell Hub
+              </Link>
+              <Link href="/aulawell-hub#waitlist" className={ctaOnNavyGhost}>
+                Join the Waitlist
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 9 · How it works */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow>How it works</Eyebrow>
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              From choosing a service to the first lesson
+            </h2>
+          </FadeIn>
+
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {howItWorks.map((item, i) => (
+              <FadeIn key={item.step} delay={i * 80}>
+                <div className="flex h-full flex-col rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
+                  <span className="font-serif text-3xl text-gold">{item.step}</span>
+                  <h3 className="mt-3 font-serif text-lg text-navy">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">{item.body}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          <FadeIn className="mt-10 text-center">
+            <Link href="/about/how-it-works" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold-ink hover:text-navy">
+              See the full booking journey
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* 10 · Final booking CTA */}
+      <section className="bg-cream-panel/60 py-20 sm:py-24">
+        <div className="mx-auto max-w-[900px] px-4 text-center sm:px-6 lg:px-8">
+          <FadeIn>
+            <Sparkles className="mx-auto h-8 w-8 text-gold" />
+            <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+              Ready to find the right English support?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-ink-soft">
+              Choose a service and package, pick your educator, and we&apos;ll take
+              care of the rest — online worldwide, or in person in Madrid and Lisbon.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/book" className={ctaPrimary}>
+                Book English Support
+              </Link>
+              <Link href="/enquire" className={ctaSecondary}>
+                Enquire About Bespoke Support
+              </Link>
+            </div>
           </FadeIn>
         </div>
       </section>

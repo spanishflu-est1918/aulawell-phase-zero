@@ -61,7 +61,7 @@ export default function PrivacyPolicyPage() {
                 </p>
                 <ul className="text-lg text-slate-600 space-y-3 mb-8">
                   <li><strong>Identity Data:</strong> name, age, or student information.</li>
-                  <li><strong>Contact Data:</strong> email address, phone number.</li>
+                  <li><strong>Contact Data:</strong> email address, and — only where you provide it and explicitly opt in — a WhatsApp number.</li>
                   <li><strong>Service Data:</strong> academic subjects requested, progress notes, feedback.</li>
                   <li><strong>Payment Data:</strong> if applicable, billing details (processed securely via third-party payment processors; we do not store credit card details).</li>
                   <li><strong>Technical Data:</strong> IP address, browser type, cookies, and analytics data.</li>
@@ -77,6 +77,7 @@ export default function PrivacyPolicyPage() {
                   <li>Provide tutoring and academic support services.</li>
                   <li>Manage consultations, bookings, and payments.</li>
                   <li>Communicate with you (confirmations, updates, resources).</li>
+                  <li>Message you on WhatsApp — only if you have explicitly opted in when providing your number, and only about the enquiry, consultation or booking you gave it for.</li>
                   <li>Send marketing emails (only if you have opted in).</li>
                   <li>Improve our services and website performance.</li>
                 </ul>

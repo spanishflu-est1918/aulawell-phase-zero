@@ -1,5 +1,6 @@
 import { FileText } from "lucide-react"
 import { FadeIn } from "@/components/ui/fade-in"
+import { OFFER_RULES } from "@/lib/pricing"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -83,6 +84,24 @@ export default function TermsPage() {
                 <ul className="text-lg text-slate-600 space-y-3 mb-8">
                   <li><strong>Accepted payment methods:</strong> Bank transfer, Bizum and exceptional cases, in cash.</li>
                   <li>Lessons will only be confirmed once payment has been received (unless otherwise agreed).</li>
+                </ul>
+
+                <div className="border-t border-slate-200 my-8"></div>
+
+                <h2 className="text-3xl font-bold text-navy mt-12 mb-6 font-serif">
+                  Offers and Savings
+                </h2>
+                <p className="text-lg text-slate-600 mb-4">
+                  All launch tuition is one-to-one. Starting prices are shown as
+                  &quot;from&quot; prices for tuition with an Aulawell Tutor; Head Tutor
+                  appointments and full package options are shared transparently at
+                  checkout or following your booking enquiry. The following terms
+                  apply to offers and savings:
+                </p>
+                <ul className="text-lg text-slate-600 space-y-3 mb-8 list-disc pl-6">
+                  {OFFER_RULES.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
                 </ul>
 
                 <div className="border-t border-slate-200 my-8"></div>

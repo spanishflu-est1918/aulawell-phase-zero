@@ -18,6 +18,7 @@ import {
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { hasCustomRate, isPostPayCode, unitRateFor } from "@/lib/booking/rates"
 import { getStripe, isStripeConfigured } from "@/lib/booking/stripe"
+import { normalizeWhatsApp } from "@/lib/phone"
 
 export const dynamic = "force-dynamic"
 
@@ -25,8 +26,11 @@ interface CheckoutBody {
   slots?: unknown
   name?: unknown
   email?: unknown
+  phone?: unknown
+  whatsappConsent?: unknown
   rate?: unknown
   tier?: unknown
+  service?: unknown
 }
 
 export async function POST(req: NextRequest) {
@@ -46,8 +50,13 @@ export async function POST(req: NextRequest) {
 
   const name = typeof body.name === "string" ? body.name.trim() : ""
   const email = typeof body.email === "string" ? body.email.trim() : ""
+  // Never store an unconfirmed number, and never store one that isn't
+  // dialable — a normalization failure is treated the same as "not given".
+  const whatsappConsent = body.whatsappConsent === true
+  const phone = whatsappConsent && typeof body.phone === "string" ? normalizeWhatsApp(body.phone) : ""
   const rateCode = typeof body.rate === "string" ? body.rate : undefined
   const tier = isTutorTier(body.tier) ? body.tier : DEFAULT_TIER
+  const service = typeof body.service === "string" ? body.service : undefined
   const slots = Array.isArray(body.slots)
     ? body.slots.filter((s): s is string => typeof s === "string")
     : []
@@ -156,6 +165,7 @@ export async function POST(req: NextRequest) {
     }
     const lines = [
       `New post-pay booking from ${name} (${email}) — no payment taken, invoices go out automatically after each lesson.`,
+      ...(phone ? [`WhatsApp: ${phone} (consented)`] : []),
       "",
       "Confirmed lessons:",
       ...booked.map((s) => `  - ${describeSlot(s)}`),
@@ -194,8 +204,11 @@ export async function POST(req: NextRequest) {
         slots: slotsUtc.join(","),
         student_name: name,
         student_email: email,
+        student_whatsapp: phone,
+        whatsapp_consent: whatsappConsent ? "1" : "0",
         rate_code: rateCode ?? "",
         tier,
+        service: service ?? "",
       },
       payment_intent_data: {
         metadata: {

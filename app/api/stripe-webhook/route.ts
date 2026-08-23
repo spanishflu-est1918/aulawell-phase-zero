@@ -13,6 +13,9 @@ import {
 import { describeSlot, notifyOwner } from "@/lib/booking/notify"
 import { hasCustomRate, unitRateFor } from "@/lib/booking/rates"
 import { getStripe } from "@/lib/booking/stripe"
+import { createBookingRecord, checkTenLessonCustomerType } from "@/lib/airtable"
+import { sendParentEmail } from "@/lib/email"
+import { bookingConfirmation } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
 
@@ -45,6 +48,8 @@ export async function POST(req: NextRequest) {
   const slots = (meta.slots ?? "").split(",").filter(Boolean)
   const name = meta.student_name ?? "Unknown"
   const email = meta.student_email ?? session.customer_email ?? ""
+  const phone = meta.student_whatsapp || undefined
+  const whatsappConsent = meta.whatsapp_consent === "1"
   const tier = isTutorTier(meta.tier) ? meta.tier : DEFAULT_TIER
   // Recompute the price exactly as checkout did (tier price or family rate,
   // then bundle discount) so a tampered session can never verify.
@@ -119,6 +124,15 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // The 20% saving only applies to a learner's FIRST 10-lesson package. We
+  // always charge the advertised (20%-off) price at checkout — never a
+  // silent surcharge — but for a 10+ lesson purchase we check Airtable for a
+  // prior 10-lesson package by this email so a repeat purchase is flagged
+  // for Amy to review and apply the offer rules manually. Checked before the
+  // current booking is written, so it can never match itself.
+  const checkTenLesson = slots.length >= 10
+  const customerType = checkTenLesson ? await checkTenLessonCustomerType(email) : undefined
+
   const lines = [
     `New paid booking from ${name} (${email})`,
     `Lesson type: ${TUTOR_TIERS[tier].label}`,
@@ -134,12 +148,61 @@ export async function POST(req: NextRequest) {
       ...failed.map((f) => `  - ${describeSlot(f.slot)} (${f.error ?? "unknown error"})`)
     )
   }
+  if (customerType === "returning") {
+    lines.push(
+      "",
+      "ACTION NEEDED — 20% saving eligibility: this email has a previous 10-lesson " +
+        "package on record. The 20% saving is meant for a learner's first 10-lesson " +
+        "package only — please review and apply the offer rules manually (e.g. an " +
+        "adjustment invoice) if this booking should not have received it."
+    )
+  } else if (customerType === "unknown") {
+    lines.push(
+      "",
+      "NOTE — 20% saving eligibility could not be checked automatically (Airtable " +
+        "lookup unavailable). Please confirm manually whether this is the learner's " +
+        "first 10-lesson package."
+    )
+  }
   await notifyOwner(
     failed.length > 0
       ? "Aulawell booking: action needed"
-      : "Aulawell: new lessons booked",
+      : customerType === "returning"
+        ? "Aulawell booking: action needed — check 20% eligibility"
+        : "Aulawell: new lessons booked",
     lines.join("\n")
   )
+
+  // Operational record in Airtable (fail-soft — never affects fulfilment).
+  if (booked.length > 0) {
+    await createBookingRecord({
+      name,
+      email,
+      phone,
+      whatsappConsent,
+      tierLabel: TUTOR_TIERS[tier].label,
+      amountPaidPence: session.amount_total ?? 0,
+      currency: session.currency ?? CURRENCY,
+      lessonSlotsIso: booked,
+      stripeSessionId: session.id,
+      customerType,
+    })
+
+    // Confirm to the parent — fail-soft, never affects fulfilment. Only the
+    // lessons that actually succeeded (failed ones were auto-refunded above
+    // and shouldn't be presented as booked).
+    if (email) {
+      await sendParentEmail({
+        to: email,
+        ...bookingConfirmation({
+          name,
+          educatorLabel: TUTOR_TIERS[tier].label,
+          amountLabel: formatPrice(session.amount_total ?? 0),
+          lessonLines: booked.map(describeSlot),
+        }),
+      })
+    }
+  }
 
   return NextResponse.json({ received: true })
 }

@@ -31,7 +31,8 @@ export function hasCustomRate(tier: TutorTier, code?: string | null): boolean {
   return tier === "head" && familyRate(code)?.cents !== undefined
 }
 
-// Per-lesson price in cents before any bundle discount.
+// Per-lesson price in cents before any bundle discount. Head Tutor is a flat
+// £45 across every service.
 export function unitRateFor(tier: TutorTier, code?: string | null): number {
   if (tier === "head") {
     return familyRate(code)?.cents ?? TUTOR_TIERS.head.priceCents

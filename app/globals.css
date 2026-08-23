@@ -6,7 +6,13 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-navy: var(--navy);
+  --color-navy-dark: var(--navy-dark);
   --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-cream: var(--cream);
+  --color-cream-panel: var(--cream-panel);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -46,27 +52,35 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #ffffff;
-  --foreground: #171717;
-  --navy: #1e3a5f;
-  --gold: #f59e0b;
+  /* Aulawell palette — warm ivory, deep navy ink, restrained muted gold */
+  --cream: #f7f3eb;
+  --cream-panel: #efe7d6;
+  --navy: #13283f;
+  --navy-dark: #0f2237;
+  --gold: #c7a46a;
+  --gold-ink: #9a7641;
+  --ink: #223142;
+  --ink-soft: #55636f;
+
+  --background: #f7f3eb;
+  --foreground: #223142;
   --card: #ffffff;
-  --card-foreground: #171717;
+  --card-foreground: #223142;
   --popover: #ffffff;
-  --popover-foreground: #171717;
-  --primary: #1e3a5f;
+  --popover-foreground: #223142;
+  --primary: #13283f;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1e3a5f;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #f3f4f6;
-  --accent-foreground: #1e3a5f;
+  --secondary: #efe7d6;
+  --secondary-foreground: #13283f;
+  --muted: #efe7d6;
+  --muted-foreground: #55636f;
+  --accent: #efe7d6;
+  --accent-foreground: #13283f;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #1e3a5f;
+  --border: #e2d9c8;
+  --input: #e2d9c8;
+  --ring: #13283f;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
