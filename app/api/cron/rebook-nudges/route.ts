@@ -1,6 +1,6 @@
-// Daily cron (see vercel.json): finds students/groups with exactly 1 lesson
-// left in their current package and emails the parent a rebook invite, so a
-// family is never surprised by lessons quietly running out.
+// Daily cron (see vercel.json): finds students/groups at 1 lesson left or
+// whose package has just run out, and emails the parent a rebook invite, so
+// a family is never surprised by lessons quietly running out.
 //
 // Idempotency: "Rebook Notified For Package Size" on the record is compared
 // to the current Package Size — a nudge only fires once per package, and
@@ -27,7 +27,10 @@ export async function GET(req: NextRequest) {
   const errors: string[] = []
 
   for (const c of candidates) {
-    const { subject, html, text } = rebookNudge({ studentGroupName: c.studentGroupName })
+    const { subject, html, text } = rebookNudge({
+      studentGroupName: c.studentGroupName,
+      lessonsRemaining: c.lessonsRemaining,
+    })
     const emailed = await sendParentEmail({ to: c.parentEmail, subject, html, text })
 
     // Only mark as notified once the email actually sent — if Resend isn't
@@ -51,7 +54,7 @@ export async function GET(req: NextRequest) {
   if (sent.length > 0) {
     await notifyOwner(
       "Aulawell: rebook nudges sent",
-      `Sent a "1 lesson left" rebook nudge to:\n\n${sent.join("\n")}`
+      `Sent a rebook nudge to:\n\n${sent.join("\n")}`
     )
   }
   if (errors.length > 0) {

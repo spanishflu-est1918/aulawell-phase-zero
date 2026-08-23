@@ -285,14 +285,17 @@ export async function createLessonRecord(
 }
 
 // ---------------------------------------------------------------------------
-// Rebook nudge — when a student/group has exactly 1 lesson left in their
-// current package, email the parent (and flag Amy) to invite them to rebook.
+// Rebook nudge — once a student/group is down to 1 lesson left (or their
+// package has just run out entirely), email the parent (and flag Amy) to
+// invite them to rebook. Using <=1 rather than exactly 1 means a package
+// that skips straight from 2 remaining to 0 (e.g. two lessons logged the
+// same day) still triggers a nudge instead of silently never firing.
 //
 // "Rebook Notified For Package Size" stores the Package Size value at the
 // moment a nudge was sent. Comparing that to the CURRENT Package Size (rather
 // than a plain boolean) means a nudge fires again automatically the next time
-// this package winds down to 1 remaining — no manual reset needed when Amy
-// starts a new package for the same student.
+// this package winds down — no manual reset needed when Amy starts a new
+// package for the same student.
 // ---------------------------------------------------------------------------
 
 async function updateRecord(
@@ -330,16 +333,18 @@ export interface RebookCandidate {
   studentGroupName: string
   parentEmail: string
   packageSize: number
+  lessonsRemaining: number
 }
 
-// Students/groups with exactly 1 lesson left whose package size hasn't
-// already triggered a nudge. Excludes records with no parent email on file
-// (nothing to send to — Amy would still see these via the Airtable view).
+// Students/groups at 1 lesson left or fewer (but not overbooked negative)
+// whose package size hasn't already triggered a nudge. Excludes records with
+// no parent email on file (nothing to send to — Amy would still see these
+// via the Airtable view).
 export async function listRebookCandidates(): Promise<RebookCandidate[]> {
   if (!isAirtableConfigured()) return []
   try {
     const formula =
-      "AND({Lessons Remaining}=1, {Parent/Student Email}!='', " +
+      "AND({Lessons Remaining}<=1, {Lessons Remaining}>=0, {Parent/Student Email}!='', " +
       "IF({Rebook Notified For Package Size}={Package Size}, FALSE(), TRUE()))"
     const url = `${AIRTABLE_API}/${BASE_ID}/${encodeURIComponent(TABLES.studentsGroups)}?filterByFormula=${encodeURIComponent(formula)}`
     const res = await fetch(url, {
@@ -360,6 +365,7 @@ export async function listRebookCandidates(): Promise<RebookCandidate[]> {
       studentGroupName: String(r.fields["Student/Group Name"] ?? ""),
       parentEmail: String(r.fields["Parent/Student Email"] ?? ""),
       packageSize: Number(r.fields["Package Size"] ?? 0),
+      lessonsRemaining: Number(r.fields["Lessons Remaining"] ?? 0),
     }))
   } catch (err) {
     console.error("[airtable] rebook candidates lookup error:", err)

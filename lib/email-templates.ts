@@ -76,14 +76,24 @@ export function bookingConfirmation(input: {
 // ---------------------------------------------------------------------------
 export function rebookNudge(input: {
   studentGroupName: string
+  lessonsRemaining: number
 }): { subject: string; html: string; text: string } {
-  const subject = `Just one lesson left — book ${input.studentGroupName}'s next package`
+  const finished = input.lessonsRemaining <= 0
+  const statusLine = finished
+    ? `${input.studentGroupName} has just completed their current package with Aulawell.`
+    : `${input.studentGroupName} has <strong>one lesson remaining</strong> in their current package with Aulawell.`
+  const statusLineText = finished
+    ? `${input.studentGroupName} has just completed their current package with Aulawell.`
+    : `${input.studentGroupName} has one lesson remaining in their current package with Aulawell.`
+  const subject = finished
+    ? `${input.studentGroupName}'s package is complete — book the next one`
+    : `Just one lesson left — book ${input.studentGroupName}'s next package`
   const html = emailShell(`
     <p style="margin:0 0 16px;">Hi there,</p>
-    <p style="margin:0 0 16px;">Just a heads up — ${input.studentGroupName} has <strong>one lesson remaining</strong> in their current package with Aulawell.</p>
+    <p style="margin:0 0 16px;">Just a heads up — ${statusLine}</p>
     <p style="margin:0 0 16px;">To keep lessons running without a gap, let us know if you'd like to book the next package. You can reply to this email or message us directly and we'll get it sorted.</p>
     <p style="margin:0;"><a href="${waLink}" style="color:#13283f;font-weight:600;">Message on WhatsApp</a></p>
   `)
-  const text = `Hi there,\n\nJust a heads up — ${input.studentGroupName} has one lesson remaining in their current package with Aulawell.\n\nTo keep lessons running without a gap, let us know if you'd like to book the next package — reply to this email or WhatsApp us: ${waLink}`
+  const text = `Hi there,\n\nJust a heads up — ${statusLineText}\n\nTo keep lessons running without a gap, let us know if you'd like to book the next package — reply to this email or WhatsApp us: ${waLink}`
   return { subject, html, text }
 }
