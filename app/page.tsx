@@ -291,6 +291,14 @@ export default function HomePage() {
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
               From choosing a service to the first lesson
             </h2>
+            <p className="mt-4 text-ink-soft">
+              Already know what you need? Follow the steps below. Not sure
+              yet?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free 30-minute consultation
+              </Link>{" "}
+              and we&apos;ll point you to the right fit first.
+            </p>
           </FadeIn>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -334,6 +342,13 @@ export default function HomePage() {
                 Enquire About Bespoke Support
               </Link>
             </div>
+            <p className="mt-6 text-sm text-ink-soft">
+              Prefer to talk it through first?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free consultation
+              </Link>
+              .
+            </p>
           </FadeIn>
         </div>
       </section>

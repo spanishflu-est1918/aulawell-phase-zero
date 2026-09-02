@@ -290,6 +290,13 @@ export default function TutorsPage() {
                 Enquire
               </Link>
             </div>
+            <p className="mt-6 text-sm text-white/75">
+              Prefer to talk it through first?{" "}
+              <Link href="/consultation" className="font-medium text-white underline underline-offset-4 hover:text-gold">
+                Book a free consultation
+              </Link>
+              .
+            </p>
           </FadeIn>
         </div>
       </section>

@@ -36,6 +36,14 @@ export default function BookPage() {
               Choose your service and package, pick your educator, and secure your
               place. Online worldwide, or in person in Madrid and Lisbon.
             </p>
+            <p className="mx-auto mt-4 max-w-2xl text-sm text-ink-soft">
+              Already spoken to us or know exactly what you need? Follow the
+              steps below. Prefer to talk it through first?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free consultation
+              </Link>{" "}
+              and we&apos;ll recommend the right fit before you book.
+            </p>
           </FadeIn>
         </div>
       </section>
