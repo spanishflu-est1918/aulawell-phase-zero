@@ -1,7 +1,17 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { Metadata } from "next"
-import { ShieldCheck, BadgeCheck, UserCheck, CalendarClock } from "lucide-react"
+import {
+  ShieldCheck,
+  BadgeCheck,
+  UserCheck,
+  CalendarClock,
+  MessageCircle,
+  Compass,
+  CalendarCheck,
+  BookOpen,
+  TrendingUp,
+} from "lucide-react"
 import { FadeIn } from "@/components/ui/fade-in"
 import { Eyebrow } from "@/components/marketing/Eyebrow"
 import { EducatorLevels } from "@/components/marketing/EducatorLevels"
@@ -18,32 +28,32 @@ export const metadata: Metadata = {
 
 const processSteps = [
   {
+    icon: MessageCircle,
     title: "Tell us what you need",
     body: "Get in touch with the course or support you're looking for, from ongoing academic support to exam preparation.",
   },
   {
+    icon: Compass,
     title: "We recommend the right fit",
     body: "We'll consult with you on the right tutor, package and next steps based on your learner's needs and goals.",
   },
   {
+    icon: CalendarCheck,
     title: "Book your package",
     body: "Choose the recommended package and confirm your place.",
   },
   {
+    icon: BookOpen,
     title: "Lessons commence",
     body: "Your learner begins working one-to-one with their Aulawell tutor, with progress monitored throughout.",
   },
   {
+    icon: TrendingUp,
     title: "Stay informed",
     body: "Parents receive clear feedback on progress, priorities and next steps throughout the tutoring journey.",
   },
 ]
 
-
-const amyStats = [
-  { value: "100%", label: "of students achieved A–C grades" },
-  { value: "72%", label: "achieved A–A*" },
-]
 
 const amyCredentials = [
   "BA English Literature, University of Manchester",
@@ -185,22 +195,6 @@ export default function TutorsPage() {
 
             <FadeIn delay={120}>
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  {amyStats.map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="rounded-2xl border border-navy/12 bg-white p-5 text-center shadow-sm"
-                    >
-                      <div className="font-serif text-3xl text-gold-ink">
-                        {stat.value}
-                      </div>
-                      <p className="mt-1.5 text-xs leading-snug text-ink-soft">
-                        {stat.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
                 <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
                     Qualifications
@@ -250,10 +244,13 @@ export default function TutorsPage() {
                       className="absolute left-6 top-12 bottom-0 w-px bg-navy/15"
                     />
                   )}
-                  <span className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-cream font-serif text-lg text-navy">
-                    {String(i + 1).padStart(2, "0")}
+                  <span className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-cream text-navy">
+                    <step.icon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
-                  <h3 className="pt-2 font-serif text-lg text-navy">
+                  <span className="block pt-1 text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Step {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-0.5 font-serif text-lg text-navy">
                     {step.title}
                   </h3>
                   <p className="mt-1.5 leading-relaxed text-ink-soft">
@@ -269,10 +266,13 @@ export default function TutorsPage() {
             {processSteps.map((step, i) => (
               <div key={step.title} className="flex flex-1 items-start last:flex-none">
                 <FadeIn delay={i * 80} className="flex w-40 flex-col items-center text-center xl:w-48">
-                  <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-gold bg-cream font-serif text-lg text-navy">
-                    {String(i + 1).padStart(2, "0")}
+                  <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-gold bg-cream text-navy">
+                    <step.icon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
-                  <h3 className="mt-4 font-serif text-lg text-navy">
+                  <span className="mt-3 text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Step {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-0.5 font-serif text-lg text-navy">
                     {step.title}
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
