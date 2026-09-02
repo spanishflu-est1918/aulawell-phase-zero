@@ -55,10 +55,9 @@ const processSteps = [
 ]
 
 
-const amyCredentials = [
-  "BA English Literature, University of Manchester",
-  "CELTA",
-  "Teacher training qualified",
+const amyResults = [
+  { value: "100%", label: "of students achieved A–C grades" },
+  { value: "72%", label: "achieved A–A*" },
 ]
 
 const amyPlacements = [
@@ -197,18 +196,25 @@ export default function TutorsPage() {
               <div className="space-y-6">
                 <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
-                    Qualifications
+                    Results that hold
                   </h3>
-                  <ul className="mt-3 space-y-1.5 text-sm text-ink">
-                    {amyCredentials.map((c) => (
-                      <li key={c}>{c}</li>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    {amyResults.map((stat) => (
+                      <div key={stat.label}>
+                        <div className="font-serif text-3xl text-navy">
+                          {stat.value}
+                        </div>
+                        <p className="mt-1 text-xs leading-snug text-ink-soft">
+                          {stat.label}
+                        </p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
 
                 <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
-                    Students placed at
+                    Where our students go
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-ink">
                     {amyPlacements.join(" · ")}
