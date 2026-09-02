@@ -3,7 +3,8 @@ import type { Metadata } from "next"
 import { CheckCircle } from "lucide-react"
 import { BOOKING_TIMEZONE, formatPrice } from "@/lib/booking/config"
 import { getStripe, isStripeClientConfigured } from "@/lib/booking/stripe"
-import { Button } from "@/components/ui/button"
+import { FadeIn } from "@/components/ui/fade-in"
+import { ctaPrimary } from "@/lib/ui"
 
 export const metadata: Metadata = {
   title: "Booking Confirmed | Aulawell Tuition",
@@ -37,34 +38,34 @@ export default async function BookingSuccessPage({
       .filter((s) => s && !Number.isNaN(Date.parse(s)))
     const failedCount = Number(failed) || 0
     return (
-      <div className="flex flex-col">
-        <section className="bg-gradient-to-b from-slate-50 to-white py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto text-center">
-              <CheckCircle className="mx-auto mb-6 h-14 w-14 text-gold" />
-              <h1 className="text-4xl font-bold text-navy mb-4 font-serif">
+      <div className="bg-cream">
+        <section className="py-20 sm:py-28">
+          <div className="mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
+            <FadeIn>
+              <CheckCircle className="mx-auto h-14 w-14 text-gold" />
+              <h1 className="mt-6 font-serif text-4xl text-navy sm:text-5xl">
                 Lessons booked
               </h1>
-              <p className="text-xl text-slate-600 mb-8">
+              <p className="mt-6 text-lg leading-relaxed text-ink">
                 Your lessons are confirmed &mdash; calendar invitations will arrive by
                 email shortly. No payment is needed today: after each lesson you&apos;ll
                 receive an invoice by email with a secure online payment link.
               </p>
               {lessons.length > 0 && (
-                <ul className="mx-auto mb-10 max-w-md space-y-2 text-left">
+                <ul className="mx-auto mt-8 max-w-md space-y-2 text-left">
                   {lessons.map((iso) => (
                     <li
                       key={iso}
-                      className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700"
+                      className="rounded-lg border border-navy/12 bg-white px-4 py-3 text-ink shadow-sm"
                     >
                       {describeSlot(iso)}
-                      <span className="ml-2 text-xs text-slate-400">(Madrid time)</span>
+                      <span className="ml-2 text-xs text-ink-soft">(Madrid time)</span>
                     </li>
                   ))}
                 </ul>
               )}
               {failedCount > 0 && (
-                <p className="mx-auto mb-10 max-w-md rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <p className="mx-auto mt-8 max-w-md rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                   {failedCount} of your chosen time{failedCount > 1 ? "s were" : " was"} no
                   longer available and {failedCount > 1 ? "were" : "was"} not booked &mdash;
                   please pick {failedCount > 1 ? "replacements" : "a replacement"} from the{" "}
@@ -74,10 +75,10 @@ export default async function BookingSuccessPage({
                   .
                 </p>
               )}
-              <Button asChild>
-                <Link href="/">Back to home</Link>
-              </Button>
-            </div>
+              <Link href="/" className={`${ctaPrimary} mt-10`}>
+                Back to home
+              </Link>
+            </FadeIn>
           </div>
         </section>
       </div>
@@ -99,49 +100,49 @@ export default async function BookingSuccessPage({
   }
 
   return (
-    <div className="flex flex-col">
-      <section className="bg-gradient-to-b from-slate-50 to-white py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <CheckCircle className="mx-auto mb-6 h-14 w-14 text-gold" />
-            <h1 className="text-4xl font-bold text-navy mb-4 font-serif">
+    <div className="bg-cream">
+      <section className="py-20 sm:py-28">
+        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
+          <FadeIn>
+            <CheckCircle className="mx-auto h-14 w-14 text-gold" />
+            <h1 className="mt-6 font-serif text-4xl text-navy sm:text-5xl">
               {paid ? "Payment received" : "Thank you!"}
             </h1>
             {paid ? (
               <>
-                <p className="text-xl text-slate-600 mb-8">
+                <p className="mt-6 text-lg leading-relaxed text-ink">
                   Your payment{amount ? ` of ${formatPrice(amount)}` : ""} was successful.
                   We&apos;re confirming the selected times now; calendar invitations will
                   arrive by email shortly.
                 </p>
                 {lessons.length > 0 && (
-                  <ul className="mx-auto mb-10 max-w-md space-y-2 text-left">
+                  <ul className="mx-auto mt-8 max-w-md space-y-2 text-left">
                     {lessons.map((iso) => (
                       <li
                         key={iso}
-                        className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700"
+                        className="rounded-lg border border-navy/12 bg-white px-4 py-3 text-ink shadow-sm"
                       >
                         {describeSlot(iso)}
-                        <span className="ml-2 text-xs text-slate-400">(Madrid time)</span>
+                        <span className="ml-2 text-xs text-ink-soft">(Madrid time)</span>
                       </li>
                     ))}
                   </ul>
                 )}
               </>
             ) : (
-              <p className="text-xl text-slate-600 mb-8">
+              <p className="mt-6 text-lg leading-relaxed text-ink">
                 We couldn&apos;t confirm this payment session. If you completed a payment,
                 you&apos;ll still receive your confirmation email shortly &mdash; or{" "}
-                <Link href="/enquire" className="text-navy underline underline-offset-4 hover:text-gold transition-colors">
+                <Link href="/enquire" className="text-navy underline underline-offset-4 hover:text-gold-ink">
                   contact us
                 </Link>{" "}
                 and we&apos;ll sort it out.
               </p>
             )}
-            <Button asChild>
-              <Link href="/">Back to home</Link>
-            </Button>
-          </div>
+            <Link href="/" className={`${ctaPrimary} mt-10`}>
+              Back to home
+            </Link>
+          </FadeIn>
         </div>
       </section>
     </div>

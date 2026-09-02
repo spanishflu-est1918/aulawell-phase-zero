@@ -46,7 +46,7 @@ const wellCopy =
 const howItWorks = [
   { step: "01", title: "Choose your service", body: "School English, exams, English qualifications or university applications." },
   { step: "02", title: "Choose your package", body: "A single lesson, a 5-lesson boost or 10-lesson term support." },
-  { step: "03", title: "Choose your educator", body: "An Aulawell Tutor from £35, or Head Tutor Amy directly." },
+  { step: "03", title: "Choose your educator level", body: "An Aulawell Tutor from £35, or Head Tutor Amy directly — we confirm the specific tutor match." },
   { step: "04", title: "Secure your place", body: "Complete a short learner profile so we can prepare properly." },
   { step: "05", title: "Start learning", body: "Book your lessons and begin — online worldwide or in person." },
 ]
@@ -291,6 +291,14 @@ export default function HomePage() {
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
               From choosing a service to the first lesson
             </h2>
+            <p className="mt-4 text-ink-soft">
+              Already know what you need? Follow the steps below. Not sure
+              yet?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free 30-minute consultation
+              </Link>{" "}
+              and we&apos;ll point you to the right fit first.
+            </p>
           </FadeIn>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -334,6 +342,13 @@ export default function HomePage() {
                 Enquire About Bespoke Support
               </Link>
             </div>
+            <p className="mt-6 text-sm text-ink-soft">
+              Not sure which package or tier fits?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free 30-minute consultation
+              </Link>
+              .
+            </p>
           </FadeIn>
         </div>
       </section>

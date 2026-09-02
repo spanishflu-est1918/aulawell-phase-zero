@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 }
 
 const heroIntro =
-  "Aulawell is product-led. Families can select and purchase a clear service in a few simple steps — no lengthy sales process before you begin. Here is exactly how it works, from first choice to first lesson."
+  "If you already know what your learner needs, you can choose a service and package and be booked in a few simple steps. If you're not sure yet, a free consultation gets you a recommendation first. Here is exactly how both paths work."
 
 const steps = [
   {
@@ -34,7 +34,7 @@ const steps = [
   {
     step: "03",
     title: "Choose your educator level",
-    body: "An Aulawell Tutor from £35, or Head Tutor Amy from £45.",
+    body: "An Aulawell Tutor from £35, or Head Tutor Amy from £45 — Amy still confirms the specific tutor match.",
   },
   {
     step: "04",
@@ -117,10 +117,17 @@ export default function HowItWorksPage() {
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-8">
           <FadeIn className="mx-auto max-w-2xl text-center">
-            <Eyebrow className="justify-center">The booking journey</Eyebrow>
+            <Eyebrow className="justify-center">If you&apos;re ready to book</Eyebrow>
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
               Seven steps to your first lesson
             </h2>
+            <p className="mt-4 text-ink-soft">
+              Prefer a recommendation first?{" "}
+              <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
+                Book a free 30-minute consultation
+              </Link>{" "}
+              instead — no payment, no obligation.
+            </p>
           </FadeIn>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -207,6 +214,13 @@ export default function HowItWorksPage() {
                 Enquire
               </Link>
             </div>
+            <p className="mt-6 text-sm text-white/75">
+              Not sure which package or tier fits?{" "}
+              <Link href="/consultation" className="font-medium text-white underline underline-offset-4 hover:text-gold">
+                Book a free 30-minute consultation
+              </Link>
+              .
+            </p>
           </FadeIn>
         </div>
       </section>

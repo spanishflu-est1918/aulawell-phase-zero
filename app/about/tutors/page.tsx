@@ -1,7 +1,17 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { Metadata } from "next"
-import { ShieldCheck, BadgeCheck, UserCheck, CalendarClock } from "lucide-react"
+import {
+  ShieldCheck,
+  BadgeCheck,
+  UserCheck,
+  CalendarClock,
+  MessageCircle,
+  Compass,
+  CalendarCheck,
+  BookOpen,
+  TrendingUp,
+} from "lucide-react"
 import { FadeIn } from "@/components/ui/fade-in"
 import { Eyebrow } from "@/components/marketing/Eyebrow"
 import { EducatorLevels } from "@/components/marketing/EducatorLevels"
@@ -15,14 +25,49 @@ export const metadata: Metadata = {
     "Every Aulawell learner is taught one-to-one by a carefully selected tutor, with Amy — our Founder and Academic Director — overseeing teaching quality and personally matching each learner to a tutor.",
 }
 
-const heroIntro =
-  "Aulawell is founded and led by Amy, our Founder and Academic Director. Every learner is taught one-to-one by a carefully selected tutor, with Amy overseeing teaching quality and matching each family to the right educator."
 
-const model = [
-  "Every learner is taught one-to-one by a carefully selected Aulawell tutor, chosen for the subject, the goal and the learner.",
-  "Amy, our Founder and Academic Director, oversees teaching quality and personally matches each learner to a tutor.",
-  "Families may also choose to work with Amy directly as Head Tutor, from the first lesson.",
-  "Amy retains final decision-making authority for tutor allocation, availability, exceptional pricing and any special requirements.",
+const processSteps = [
+  {
+    icon: MessageCircle,
+    title: "Tell us what you need",
+    body: "Get in touch with the course or support you're looking for, from ongoing academic support to exam preparation.",
+  },
+  {
+    icon: Compass,
+    title: "We recommend the right fit",
+    body: "We'll consult with you on the right tutor, package and next steps based on your learner's needs and goals.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Book your package",
+    body: "Choose the recommended package and confirm your place.",
+  },
+  {
+    icon: BookOpen,
+    title: "Lessons commence",
+    body: "Your learner begins working one-to-one with their Aulawell tutor, with progress monitored throughout.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Stay informed",
+    body: "Parents receive clear feedback on progress, priorities and next steps throughout the tutoring journey.",
+  },
+]
+
+
+const amyResults = [
+  { value: "100%", label: "of students achieved A–C grades" },
+  { value: "72%", label: "achieved A–A*" },
+]
+
+const amyPlacements = [
+  "St Paul's",
+  "Harrow",
+  "Oxford",
+  "Cambridge",
+  "Princeton",
+  "Penn",
+  "Duke",
 ]
 
 const levelsIntro =
@@ -75,33 +120,173 @@ export default function TutorsPage() {
             <h1 className="mt-6 max-w-3xl font-serif text-4xl leading-[1.1] tracking-tight text-navy sm:text-5xl">
               Led by Amy. Delivered by carefully selected tutors.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink">
-              {heroIntro}
-            </p>
+            <div className="mt-6 max-w-2xl space-y-4 text-lg leading-relaxed text-ink">
+              <p>
+                <strong className="font-semibold text-navy">
+                  Aulawell is founded and led by Amy, our Founder and Academic Director.
+                </strong>
+              </p>
+              <p>
+                Every learner is matched with a carefully selected Aulawell
+                tutor, with Amy overseeing tutor selection, teaching quality
+                and the right fit for each learner.
+              </p>
+              <p>
+                Our tutors go beyond academic support, combining{" "}
+                <strong className="font-semibold text-navy">
+                  mentoring and coaching, exam-focused progress and clear
+                  communication with parents
+                </strong>
+                .
+              </p>
+            </div>
           </FadeIn>
         </div>
       </section>
 
-      {/* The model */}
+      {/* Meet Amy */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-          <FadeIn className="max-w-2xl">
-            <Eyebrow>How our tutoring works</Eyebrow>
+          <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+            <FadeIn>
+              <Eyebrow>Meet Amy</Eyebrow>
+              <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+                10+ years shaping English education, worldwide
+              </h2>
+              <div className="mt-6 space-y-4 leading-relaxed text-ink">
+                <p>
+                  Amy is the Founder and Academic Director of Aulawell, with{" "}
+                  <strong className="font-semibold text-navy">
+                    10+ years of experience in English education
+                  </strong>{" "}
+                  and an international perspective shaped by growing up
+                  across{" "}
+                  <strong className="font-semibold text-navy">
+                    South America and the UK
+                  </strong>
+                  .
+                </p>
+                <p>
+                  A Manchester English Literature graduate and qualified
+                  teacher, Amy has taught students across a wide range of
+                  abilities, from{" "}
+                  <strong className="font-semibold text-navy">
+                    gifted and talented learners to students with dyslexia
+                    and ADHD
+                  </strong>
+                  .
+                </p>
+                <p>
+                  Amy founded Aulawell to close a gap she saw across the
+                  tuition market: families were choosing between anonymous
+                  marketplaces that offer little oversight of who is
+                  actually teaching, and results-only tutoring that treats
+                  grades in isolation from the learner behind them. Aulawell
+                  sits between the two — rigorous, exam-focused teaching,
+                  delivered by hand-selected tutors, with the mentoring and
+                  wellbeing built in to make the progress last. It&apos;s the
+                  classroom, made well.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={120}>
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Results that hold
+                  </h3>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    {amyResults.map((stat) => (
+                      <div key={stat.label}>
+                        <div className="font-serif text-3xl text-navy">
+                          {stat.value}
+                        </div>
+                        <p className="mt-1 text-xs leading-snug text-ink-soft">
+                          {stat.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Where our students go
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ink">
+                    {amyPlacements.join(" · ")}
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* How tutoring works */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow className="justify-center">Our process</Eyebrow>
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
-              A led model, not a marketplace
+              How tutoring works
             </h2>
+            <p className="mt-4 text-ink-soft">
+              A simple, personal process designed around your learner.
+            </p>
           </FadeIn>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            {model.map((point, i) => (
-              <FadeIn key={point} delay={i * 90}>
-                <div className="flex h-full items-start gap-4 rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
-                  <span className="font-serif text-2xl leading-none text-gold">
-                    {String(i + 1).padStart(2, "0")}
+          {/* Mobile: vertical timeline */}
+          <ol className="mt-14 lg:hidden">
+            {processSteps.map((step, i) => (
+              <FadeIn key={step.title} delay={i * 80}>
+                <li className="relative pb-10 pl-16 last:pb-0">
+                  {i < processSteps.length - 1 && (
+                    <span
+                      aria-hidden
+                      className="absolute left-6 top-12 bottom-0 w-px bg-navy/15"
+                    />
+                  )}
+                  <span className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-cream text-navy">
+                    <step.icon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
-                  <p className="leading-relaxed text-ink">{point}</p>
-                </div>
+                  <span className="block pt-1 text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Step {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-0.5 font-serif text-lg text-navy">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 leading-relaxed text-ink-soft">
+                    {step.body}
+                  </p>
+                </li>
               </FadeIn>
+            ))}
+          </ol>
+
+          {/* Desktop: horizontal journey */}
+          <div className="mt-16 hidden lg:flex lg:items-start">
+            {processSteps.map((step, i) => (
+              <div key={step.title} className="flex flex-1 items-start last:flex-none">
+                <FadeIn delay={i * 80} className="flex w-40 flex-col items-center text-center xl:w-48">
+                  <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-gold bg-cream text-navy">
+                    <step.icon className="h-5 w-5" strokeWidth={1.75} />
+                  </span>
+                  <span className="mt-3 text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Step {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-0.5 font-serif text-lg text-navy">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                    {step.body}
+                  </p>
+                </FadeIn>
+                {i < processSteps.length - 1 && (
+                  <div className="mt-6 h-px flex-1 bg-navy/15" aria-hidden />
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -222,6 +407,13 @@ export default function TutorsPage() {
                 Enquire
               </Link>
             </div>
+            <p className="mt-6 text-sm text-white/75">
+              Not sure which package or tier fits?{" "}
+              <Link href="/consultation" className="font-medium text-white underline underline-offset-4 hover:text-gold">
+                Book a free 30-minute consultation
+              </Link>
+              .
+            </p>
           </FadeIn>
         </div>
       </section>

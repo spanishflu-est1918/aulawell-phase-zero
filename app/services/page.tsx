@@ -74,12 +74,11 @@ export default function ServicesPage() {
 
           <FadeIn className="mx-auto mt-10 max-w-2xl rounded-2xl border border-navy/12 bg-white px-6 py-6 text-center shadow-sm">
             <p className="text-ink">
-              Not sure which route fits your learner? Tell us where they are and
-              where they want to get to, and we&apos;ll point you to the right
-              support.
+              Not sure which route fits your learner? Book a free 30-minute
+              consultation and we&apos;ll point you to the right support.
             </p>
-            <Link href="/enquire" className={`${ctaSecondary} mt-5`}>
-              Enquire
+            <Link href="/consultation" className={`${ctaSecondary} mt-5`}>
+              Book a Free Consultation
             </Link>
           </FadeIn>
         </div>

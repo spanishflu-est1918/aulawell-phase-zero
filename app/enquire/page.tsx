@@ -31,9 +31,16 @@ export default function EnquirePage() {
             Tell us what your learner needs
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink">
-            For standard packages you can book directly. Use this form when you
-            need a conversation first — bespoke support, in-person lessons,
-            partnerships, or anything that needs a personal recommendation.
+            For standard packages you can book directly. Use this form for
+            situations that need more than a quick recommendation — bespoke
+            support, in-person lessons, partnerships and the cases below.
+          </p>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            Just not sure which standard package or tier fits your learner?{" "}
+            <Link href="/consultation" className="font-medium text-navy underline underline-offset-2 hover:text-gold-ink">
+              Book a free 30-minute consultation
+            </Link>{" "}
+            instead — it&apos;s quicker for that.
           </p>
         </div>
       </section>
@@ -67,6 +74,13 @@ export default function EnquirePage() {
 
             <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
               <h3 className="font-serif text-lg text-navy">Prefer to talk?</h3>
+              <p className="mt-2 text-sm text-ink-soft">
+                For a quick fit-check,{" "}
+                <Link href="/consultation" className="font-medium text-navy underline underline-offset-2 hover:text-gold-ink">
+                  book a free consultation
+                </Link>
+                . For anything else, reach us directly:
+              </p>
               <ul className="mt-4 space-y-3 text-sm">
                 <li className="flex items-center gap-3">
                   <MessageCircle className="h-5 w-5 text-gold-ink" />

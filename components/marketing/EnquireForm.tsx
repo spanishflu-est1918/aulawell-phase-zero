@@ -114,17 +114,21 @@ export function EnquireForm() {
         setForm({ name: "", email: "", phone: "", whatsappConsent: false, topic: "", stage: "", location: "", message: "" })
         return
       } catch {
-        // fall through to mailto
+        // fall through to the visible error state below
       }
     }
 
-    const subject = encodeURIComponent(`Aulawell enquiry from ${form.name}`)
-    const emailBody = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nWhatsApp: ${form.phone}\nEnquiry about: ${form.topic}\nLearner stage: ${form.stage}\nLocation / time zone: ${form.location}\n\n${form.message}`
-    )
-    window.location.href = `mailto:${CONTACT_INFO.EMAIL}?subject=${subject}&body=${emailBody}`
-    setStatus("idle")
+    // Both send paths failed — show a clear error with a direct mailto link,
+    // rather than silently redirecting (which gives no feedback if the
+    // visitor has no mail client configured, e.g. many in-app browsers).
+    setStatus("error")
   }
+
+  const mailtoHref = `mailto:${CONTACT_INFO.EMAIL}?subject=${encodeURIComponent(
+    `Aulawell enquiry from ${form.name}`
+  )}&body=${encodeURIComponent(
+    `Name: ${form.name}\nEmail: ${form.email}\nWhatsApp: ${form.phone}\nEnquiry about: ${form.topic}\nLearner stage: ${form.stage}\nLocation / time zone: ${form.location}\n\n${form.message}`
+  )}`
 
   if (status === "success") {
     return (
@@ -246,9 +250,19 @@ export function EnquireForm() {
 
       {status === "error" && (
         <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          Sorry, your enquiry couldn&apos;t be sent. Please email us directly at{" "}
-          <a href={`mailto:${CONTACT_INFO.EMAIL}`} className="underline underline-offset-2">
-            {CONTACT_INFO.EMAIL}
+          Sorry, your enquiry couldn&apos;t be sent. Please{" "}
+          <a href={mailtoHref} className="underline underline-offset-2">
+            email us directly
+          </a>{" "}
+          (this link is pre-filled with what you entered above), or message us
+          on{" "}
+          <a
+            href={`https://wa.me/${CONTACT_INFO.WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            WhatsApp
           </a>
           .
         </p>
