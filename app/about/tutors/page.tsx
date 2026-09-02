@@ -16,11 +16,27 @@ export const metadata: Metadata = {
 }
 
 
-const model = [
-  "Every learner is taught one-to-one by a carefully selected Aulawell tutor, chosen for the subject, the goal and the learner.",
-  "Amy, our Founder and Academic Director, oversees teaching quality and personally matches each learner to a tutor.",
-  "Families may also choose to work with Amy directly as Head Tutor, from the first lesson.",
-  "Amy retains final decision-making authority for tutor allocation, availability, exceptional pricing and any special requirements.",
+const processSteps = [
+  {
+    title: "Tell us what you need",
+    body: "Get in touch with the course or support you're looking for, from ongoing academic support to exam preparation.",
+  },
+  {
+    title: "We recommend the right fit",
+    body: "We'll consult with you on the right tutor, package and next steps based on your learner's needs and goals.",
+  },
+  {
+    title: "Book your package",
+    body: "Choose the recommended package and confirm your place.",
+  },
+  {
+    title: "Lessons commence",
+    body: "Your learner begins working one-to-one with their Aulawell tutor, with progress monitored throughout.",
+  },
+  {
+    title: "Stay informed",
+    body: "Parents receive clear feedback on progress, priorities and next steps throughout the tutoring journey.",
+  },
 ]
 
 const levelsIntro =
@@ -97,26 +113,63 @@ export default function TutorsPage() {
         </div>
       </section>
 
-      {/* The model */}
+      {/* How tutoring works */}
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-          <FadeIn className="max-w-2xl">
-            <Eyebrow>How our tutoring works</Eyebrow>
+          <FadeIn className="mx-auto max-w-2xl text-center">
+            <Eyebrow className="justify-center">Our process</Eyebrow>
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
-              A led model, not a marketplace
+              How tutoring works
             </h2>
+            <p className="mt-4 text-ink-soft">
+              A simple, personal process designed around your learner.
+            </p>
           </FadeIn>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            {model.map((point, i) => (
-              <FadeIn key={point} delay={i * 90}>
-                <div className="flex h-full items-start gap-4 rounded-2xl border border-navy/12 bg-white p-7 shadow-sm">
-                  <span className="font-serif text-2xl leading-none text-gold">
+          {/* Mobile: vertical timeline */}
+          <ol className="mt-14 lg:hidden">
+            {processSteps.map((step, i) => (
+              <FadeIn key={step.title} delay={i * 80}>
+                <li className="relative pb-10 pl-16 last:pb-0">
+                  {i < processSteps.length - 1 && (
+                    <span
+                      aria-hidden
+                      className="absolute left-6 top-12 bottom-0 w-px bg-navy/15"
+                    />
+                  )}
+                  <span className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-cream font-serif text-lg text-navy">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="leading-relaxed text-ink">{point}</p>
-                </div>
+                  <h3 className="pt-2 font-serif text-lg text-navy">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 leading-relaxed text-ink-soft">
+                    {step.body}
+                  </p>
+                </li>
               </FadeIn>
+            ))}
+          </ol>
+
+          {/* Desktop: horizontal journey */}
+          <div className="mt-16 hidden lg:flex lg:items-start">
+            {processSteps.map((step, i) => (
+              <div key={step.title} className="flex flex-1 items-start last:flex-none">
+                <FadeIn delay={i * 80} className="flex w-40 flex-col items-center text-center xl:w-48">
+                  <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-gold bg-cream font-serif text-lg text-navy">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-4 font-serif text-lg text-navy">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                    {step.body}
+                  </p>
+                </FadeIn>
+                {i < processSteps.length - 1 && (
+                  <div className="mt-6 h-px flex-1 bg-navy/15" aria-hidden />
+                )}
+              </div>
             ))}
           </div>
         </div>
