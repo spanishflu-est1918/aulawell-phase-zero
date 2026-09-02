@@ -15,8 +15,6 @@ export const metadata: Metadata = {
     "Every Aulawell learner is taught one-to-one by a carefully selected tutor, with Amy — our Founder and Academic Director — overseeing teaching quality and personally matching each learner to a tutor.",
 }
 
-const heroIntro =
-  "Aulawell is founded and led by Amy, our Founder and Academic Director. Every learner is taught one-to-one by a carefully selected tutor, with Amy overseeing teaching quality and matching each family to the right educator."
 
 const model = [
   "Every learner is taught one-to-one by a carefully selected Aulawell tutor, chosen for the subject, the goal and the learner.",
@@ -75,9 +73,26 @@ export default function TutorsPage() {
             <h1 className="mt-6 max-w-3xl font-serif text-4xl leading-[1.1] tracking-tight text-navy sm:text-5xl">
               Led by Amy. Delivered by carefully selected tutors.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink">
-              {heroIntro}
-            </p>
+            <div className="mt-6 max-w-2xl space-y-4 text-lg leading-relaxed text-ink">
+              <p>
+                <strong className="font-semibold text-navy">
+                  Aulawell is founded and led by Amy, our Founder and Academic Director.
+                </strong>
+              </p>
+              <p>
+                Every learner is matched with a carefully selected Aulawell
+                tutor, with Amy overseeing tutor selection, teaching quality
+                and the right fit for each learner.
+              </p>
+              <p>
+                Our tutors go beyond academic support, combining{" "}
+                <strong className="font-semibold text-navy">
+                  mentoring and coaching, exam-focused progress and clear
+                  communication with parents
+                </strong>
+                .
+              </p>
+            </div>
           </FadeIn>
         </div>
       </section>
