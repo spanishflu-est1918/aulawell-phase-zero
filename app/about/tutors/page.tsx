@@ -177,17 +177,15 @@ export default function TutorsPage() {
                   .
                 </p>
                 <p>
-                  Her students have achieved{" "}
-                  <strong className="font-semibold text-navy">
-                    100% A–C grades, with 72% achieving A–A*
-                  </strong>
-                  , and gained places at leading schools and universities
-                  including{" "}
-                  <strong className="font-semibold text-navy">
-                    St Paul&apos;s, Harrow, Oxford, Cambridge, Princeton, Penn
-                    and Duke
-                  </strong>
-                  .
+                  Amy founded Aulawell to close a gap she saw across the
+                  tuition market: families were choosing between anonymous
+                  marketplaces that offer little oversight of who is
+                  actually teaching, and results-only tutoring that treats
+                  grades in isolation from the learner behind them. Aulawell
+                  sits between the two — rigorous, exam-focused teaching,
+                  delivered by hand-selected tutors, with the mentoring and
+                  wellbeing built in to make the progress last. It&apos;s the
+                  classroom, made well.
                 </p>
               </div>
             </FadeIn>
