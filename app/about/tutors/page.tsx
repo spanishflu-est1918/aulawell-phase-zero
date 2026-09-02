@@ -39,6 +39,28 @@ const processSteps = [
   },
 ]
 
+
+const amyStats = [
+  { value: "100%", label: "of students achieved A–C grades" },
+  { value: "72%", label: "achieved A–A*" },
+]
+
+const amyCredentials = [
+  "BA English Literature, University of Manchester",
+  "CELTA",
+  "Teacher training qualified",
+]
+
+const amyPlacements = [
+  "St Paul's",
+  "Harrow",
+  "Oxford",
+  "Cambridge",
+  "Princeton",
+  "Penn",
+  "Duke",
+]
+
 const levelsIntro =
   "At checkout you choose the educator level that fits your learner and your budget. Both are delivered one-to-one and overseen by Amy."
 
@@ -110,6 +132,97 @@ export default function TutorsPage() {
               </p>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* Meet Amy */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:gap-16">
+            <FadeIn>
+              <Eyebrow>Meet Amy</Eyebrow>
+              <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
+                10+ years shaping English education, worldwide
+              </h2>
+              <div className="mt-6 space-y-4 leading-relaxed text-ink">
+                <p>
+                  Amy is the Founder and Academic Director of Aulawell, with{" "}
+                  <strong className="font-semibold text-navy">
+                    10+ years of experience in English education
+                  </strong>{" "}
+                  and an international perspective shaped by growing up
+                  across{" "}
+                  <strong className="font-semibold text-navy">
+                    South America and the UK
+                  </strong>
+                  .
+                </p>
+                <p>
+                  A Manchester English Literature graduate and qualified
+                  teacher, Amy has taught students across a wide range of
+                  abilities, from{" "}
+                  <strong className="font-semibold text-navy">
+                    gifted and talented learners to students with dyslexia
+                    and ADHD
+                  </strong>
+                  .
+                </p>
+                <p>
+                  Her students have achieved{" "}
+                  <strong className="font-semibold text-navy">
+                    100% A–C grades, with 72% achieving A–A*
+                  </strong>
+                  , and gained places at leading schools and universities
+                  including{" "}
+                  <strong className="font-semibold text-navy">
+                    St Paul&apos;s, Harrow, Oxford, Cambridge, Princeton, Penn
+                    and Duke
+                  </strong>
+                  .
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={120}>
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  {amyStats.map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-2xl border border-navy/12 bg-white p-5 text-center shadow-sm"
+                    >
+                      <div className="font-serif text-3xl text-gold-ink">
+                        {stat.value}
+                      </div>
+                      <p className="mt-1.5 text-xs leading-snug text-ink-soft">
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Qualifications
+                  </h3>
+                  <ul className="mt-3 space-y-1.5 text-sm text-ink">
+                    {amyCredentials.map((c) => (
+                      <li key={c}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-navy/12 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gold-ink">
+                    Students placed at
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ink">
+                    {amyPlacements.join(" · ")}
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
