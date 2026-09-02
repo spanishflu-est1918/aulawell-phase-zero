@@ -291,9 +291,9 @@ export default function TutorsPage() {
               </Link>
             </div>
             <p className="mt-6 text-sm text-white/75">
-              Prefer to talk it through first?{" "}
+              Not sure which package or tier fits?{" "}
               <Link href="/consultation" className="font-medium text-white underline underline-offset-4 hover:text-gold">
-                Book a free consultation
+                Book a free 30-minute consultation
               </Link>
               .
             </p>

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const steps = [
   { step: "01", title: "Choose your service", body: "School English, exams, English qualifications or university applications." },
   { step: "02", title: "Choose your package", body: "A single lesson, a 5-lesson boost or 10-lesson term support." },
-  { step: "03", title: "Choose your educator", body: "An Aulawell Tutor, or Head Tutor Amy directly." },
+  { step: "03", title: "Choose your educator level", body: "An Aulawell Tutor, or Head Tutor Amy directly — we confirm the specific tutor match." },
   { step: "04", title: "Secure your place", body: "Pay securely and complete a short learner profile." },
   { step: "05", title: "Start learning", body: "Book your lessons and begin — online or in person." },
 ]
@@ -37,12 +37,12 @@ export default function BookPage() {
               place. Online worldwide, or in person in Madrid and Lisbon.
             </p>
             <p className="mx-auto mt-4 max-w-2xl text-sm text-ink-soft">
-              Already spoken to us or know exactly what you need? Follow the
-              steps below. Prefer to talk it through first?{" "}
+              Already know what you need? Follow the steps below. Not sure
+              which package or tier fits?{" "}
               <Link href="/consultation" className="font-medium text-navy underline underline-offset-4 hover:text-gold-ink">
-                Book a free consultation
+                Book a free 30-minute consultation
               </Link>{" "}
-              and we&apos;ll recommend the right fit before you book.
+              first — no payment, no obligation.
             </p>
           </FadeIn>
         </div>
@@ -69,7 +69,7 @@ export default function BookPage() {
       <section className="bg-cream-panel/40 py-16 sm:py-20">
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
           <FadeIn className="mx-auto max-w-2xl text-center">
-            <Eyebrow className="justify-center">Choose your educator</Eyebrow>
+            <Eyebrow className="justify-center">Choose your educator level</Eyebrow>
             <h2 className="mt-5 font-serif text-3xl text-navy sm:text-4xl">
               Work with an Aulawell Tutor, or with Amy directly
             </h2>
